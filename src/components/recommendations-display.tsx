@@ -177,7 +177,7 @@ export function RecommendationsDisplay({
         ))}
       </div>
 
-      <div className="mt-16">
+      <div>
           <Card className="border-2 border-primary/20 shadow-lg shadow-primary/5 text-center">
             <CardHeader>
                 <div className="mx-auto bg-accent/20 text-accent rounded-full p-3 w-fit mb-2">
@@ -207,7 +207,7 @@ export function RecommendationsDisplay({
       </div>
 
       {gardenType === 'community' && onGenerateGuide && (
-        <div className="mt-16">
+        <div>
             <Card className="border-2 border-primary/20 shadow-lg shadow-primary/5 text-center">
                 <CardHeader>
                     <div className="mx-auto bg-accent/20 text-accent rounded-full p-3 w-fit mb-2">
