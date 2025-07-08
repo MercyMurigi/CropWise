@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { CropForm } from "@/components/crop-form";
 import { RecommendationsDisplay } from "@/components/recommendations-display";
-import { getRecommendations, RecommendationResult, getGardenLayout, LayoutResult, getDealers, DealerResult } from "@/app/actions";
+import { getRecommendations, RecommendationResult, getGardenLayout, LayoutResult, getDealers, DealerResult, getTrainingGuide, TrainingGuideResult } from "@/app/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
@@ -12,13 +12,14 @@ import type { CropFormValues } from "@/components/crop-form";
 import { useToast } from "@/hooks/use-toast";
 import { GardenLayoutDisplay } from "@/components/garden-layout-display";
 import { DealersDisplay } from "@/components/dealers-display";
+import { TrainingGuideDisplay } from "@/components/training-guide-display";
 
 const LoadingSkeletons = () => (
   <div className="mt-12 space-y-8">
     <div className="flex justify-center items-center gap-2 mb-4">
       <Loader2 className="h-6 w-6 animate-spin text-primary" />
       <p className="text-center text-lg text-muted-foreground">
-        Generating your personalized crop plan...
+        Generating your group's crop plan...
       </p>
     </div>
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -68,16 +69,18 @@ const LayoutLoadingSkeleton = () => (
     </div>
 )
 
-export default function RecommendPage() {
+export default function CommunityRecommendPage() {
   const [recommendations, setRecommendations] =
     useState<RecommendationResult | null>(null);
   const [layout, setLayout] = useState<LayoutResult | null>(null);
   const [dealers, setDealers] = useState<DealerResult | null>(null);
+  const [trainingGuide, setTrainingGuide] = useState<TrainingGuideResult | null>(null);
   const [formValues, setFormValues] = useState<CropFormValues | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLayoutLoading, setIsLayoutLoading] = useState(false);
   const [isDealersLoading, setIsDealersLoading] = useState(false);
+  const [isGuideLoading, setIsGuideLoading] = useState(false);
 
 
   const { toast } = useToast();
@@ -87,12 +90,13 @@ export default function RecommendPage() {
     setRecommendations(null);
     setLayout(null);
     setDealers(null);
+    setTrainingGuide(null);
     setFormValues(formData);
     
     let recommendationsResult: RecommendationResult | null = null;
     
     try {
-      recommendationsResult = await getRecommendations({...formData, gardenType: 'family' });
+      recommendationsResult = await getRecommendations({...formData, gardenType: 'community' });
       if (!recommendationsResult || recommendationsResult.crops.length === 0) {
         throw new Error(
           "Could not generate recommendations for the given input."
@@ -159,19 +163,41 @@ export default function RecommendPage() {
     }
   }
 
+  const handleGenerateGuide = async () => {
+    if (!recommendations || !formValues) return;
+    setIsGuideLoading(true);
+    setTrainingGuide(null);
+    try {
+        const guideResult = await getTrainingGuide({
+            crops: recommendations.crops.map(c => c.name),
+            gardenType: 'community',
+        });
+        setTrainingGuide(guideResult);
+    } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : "An unknown error occurred.";
+        toast({
+            variant: "destructive",
+            title: "Could not generate guide",
+            description: errorMessage,
+        });
+    } finally {
+        setIsGuideLoading(false);
+    }
+  }
+
   return (
     <>
       <header className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary mb-2">
-          Recommendations for your Family
+          Community & School Garden Planner
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Get intelligent crop recommendations tailored to your family's needs.
+          Design nutrition gardens for groups and generate printable training materials.
         </p>
       </header>
 
       <div className="max-w-3xl mx-auto">
-        <CropForm onSubmit={handleSubmit} isLoading={isLoading || isLayoutLoading || isDealersLoading} />
+        <CropForm onSubmit={handleSubmit} isLoading={isLoading || isLayoutLoading || isDealersLoading || isGuideLoading} isCommunity={true} />
       </div>
 
       {isLoading && <LoadingSkeletons />}
@@ -183,6 +209,10 @@ export default function RecommendPage() {
             onFindDealers={handleFindDealers}
             isDealersLoading={isDealersLoading}
             dealersFound={!!dealers}
+            gardenType={'community'}
+            onGenerateGuide={handleGenerateGuide}
+            isGuideLoading={isGuideLoading}
+            guideGenerated={!!trainingGuide}
           />
           {isLayoutLoading && <LayoutLoadingSkeleton />}
           {layout && !isLayoutLoading && <GardenLayoutDisplay data={layout} />}
@@ -195,6 +225,15 @@ export default function RecommendPage() {
             </div>
           )}
           {dealers && <DealersDisplay dealers={dealers} />}
+          {isGuideLoading && (
+            <div className="flex justify-center items-center gap-2 mt-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                <p className="text-center text-lg text-muted-foreground">
+                    Generating your training guide...
+                </p>
+            </div>
+          )}
+          {trainingGuide && !isGuideLoading && <TrainingGuideDisplay data={trainingGuide} />}
         </div>
       )}
     </>

@@ -3,6 +3,7 @@
 
 import {
   generateCropRecommendations,
+  GenerateCropRecommendationsInput,
 } from '@/ai/flows/generate-crop-recommendations';
 import { diagnoseGarden, DiagnoseGardenInput } from '@/ai/flows/diagnose-garden';
 import { generateGardenLayout, GenerateGardenLayoutInput } from '@/ai/flows/generate-garden-layout';
@@ -45,7 +46,7 @@ const nutritionBasketMap = {
 };
 
 export async function getRecommendations(
-  formData: CropFormValues
+  formData: CropFormValues & { gardenType: GenerateCropRecommendationsInput['gardenType'] }
 ): Promise<RecommendationResult> {
 
   const dietaryNeedsDescription = nutritionBasketMap[formData.dietaryNeeds] || formData.dietaryNeeds;
