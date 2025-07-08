@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { RecommendationResult } from "@/app/actions";
@@ -14,18 +15,23 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Sprout, Info, Dna, ShoppingCart, MapPin, Loader2 } from "lucide-react";
+import { Sprout, Info, Dna, ShoppingCart, MapPin, Loader2, BookOpenCheck, FileText } from "lucide-react";
 import { Button } from "./ui/button";
 import Image from "next/image";
+import type { CropFormValues } from "./crop-form";
 
 interface RecommendationsDisplayProps {
   data: RecommendationResult;
   onFindDealers: () => void;
   isDealersLoading: boolean;
   dealersFound: boolean;
+  gardenType?: CropFormValues['gardenType'];
+  onGenerateGuide: () => void;
+  isGuideLoading: boolean;
+  guideGenerated: boolean;
 }
 
-export function RecommendationsDisplay({ data, onFindDealers, isDealersLoading, dealersFound }: RecommendationsDisplayProps) {
+export function RecommendationsDisplay({ data, onFindDealers, isDealersLoading, dealersFound, gardenType, onGenerateGuide, isGuideLoading, guideGenerated }: RecommendationsDisplayProps) {
   return (
     <section className="space-y-12">
       <div>
@@ -113,6 +119,34 @@ export function RecommendationsDisplay({ data, onFindDealers, isDealersLoading, 
             </CardContent>
           </Card>
       </div>
+
+      {gardenType === 'community' && (
+        <div className="mt-16">
+            <Card className="border-2 border-primary/20 shadow-lg shadow-primary/5 text-center">
+                <CardHeader>
+                    <div className="mx-auto bg-accent/20 text-accent rounded-full p-3 w-fit mb-2">
+                        <BookOpenCheck className="h-6 w-6" />
+                    </div>
+                    <CardTitle className="font-headline text-3xl">
+                        Community &amp; School Garden Resources
+                    </CardTitle>
+                    <CardDescription>
+                        Generate printable training guides and resources for your group.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button size="lg" onClick={onGenerateGuide} disabled={isGuideLoading || guideGenerated}>
+                        {isGuideLoading ? (
+                            <Loader2 className="mr-2 animate-spin" />
+                        ) : (
+                            <FileText className="mr-2" />
+                        )}
+                        {guideGenerated ? 'Guide Generated Below' : 'Generate Training Guide'}
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
+      )}
     </section>
   );
 }

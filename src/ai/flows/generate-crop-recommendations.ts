@@ -12,9 +12,10 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateCropRecommendationsInputSchema = z.object({
+  gardenType: z.enum(['family', 'community']).describe("The type of garden being planned."),
   landSize: z.string().describe('The size of the land available for farming.'),
   region: z.string().describe('The region or county where the farm is located.'),
-  familySize: z.number().describe('The number of people in the family.'),
+  familySize: z.number().describe('The number of people in the family or group.'),
   dietaryNeeds: z.string().describe('Specific dietary needs or restrictions of the family.'),
   waterAvailability: z
     .enum(['rainfed', 'irrigated', 'sack/bag garden', 'balcony garden'])
@@ -83,6 +84,8 @@ const prompt = ai.definePrompt({
 
 Your task is to suggest an optimized set of at least THREE crops that provide a balanced micronutrient supply based on the user's context. For each crop, you must also provide detailed planting information.
 
+If the user specifies a "community" garden type, your recommendations should be suitable for a larger group, potentially for educational purposes. Focus on crops that are resilient, have a good yield, and are easy to manage for groups. For a "family" garden, tailor the recommendations to a smaller scale.
+
 Context for water availability options:
 - rainfed: crops are watered by natural rainfall.
 - irrigated: crops are watered through an irrigation system.
@@ -90,9 +93,10 @@ Context for water availability options:
 - balcony garden: crops are grown in containers on a balcony.
 
 User's context:
+- Garden Type: {{{gardenType}}}
 - Land Size: {{{landSize}}}
 - Region: {{{region}}}
-- Family Size: {{{familySize}}}
+- Number of People: {{{familySize}}}
 - Dietary Needs: {{{dietaryNeeds}}}
 - Water Availability: {{{waterAvailability}}}
 

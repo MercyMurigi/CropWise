@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { CropForm } from "@/components/crop-form";
 import { RecommendationsDisplay } from "@/components/recommendations-display";
-import { getRecommendations, RecommendationResult, getGardenLayout, LayoutResult, getDealers, DealerResult } from "@/app/actions";
+import { getRecommendations, RecommendationResult, getGardenLayout, LayoutResult, getDealers, DealerResult, getTrainingGuide, TrainingGuideResult } from "@/app/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { GardenLayoutDisplay } from "@/components/garden-layout-display";
 import { DealersDisplay } from "@/components/dealers-display";
+import { TrainingGuideDisplay } from "@/components/training-guide-display";
 
 const LoadingSkeletons = () => (
   <div className="mt-12 space-y-8">
@@ -76,11 +77,14 @@ export default function RecommendPage() {
     useState<RecommendationResult | null>(null);
   const [layout, setLayout] = useState<LayoutResult | null>(null);
   const [dealers, setDealers] = useState<DealerResult | null>(null);
+  const [trainingGuide, setTrainingGuide] = useState<TrainingGuideResult | null>(null);
   const [formValues, setFormValues] = useState<CropFormValues | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLayoutLoading, setIsLayoutLoading] = useState(false);
   const [isDealersLoading, setIsDealersLoading] = useState(false);
+  const [isGuideLoading, setIsGuideLoading] = useState(false);
+
 
   const { toast } = useToast();
 
@@ -90,6 +94,7 @@ export default function RecommendPage() {
     setRecommendations(null);
     setLayout(null);
     setDealers(null);
+    setTrainingGuide(null);
     setFormValues(formData); // Store form values for later use
     
     let recommendationsResult: RecommendationResult | null = null;
@@ -165,6 +170,28 @@ export default function RecommendPage() {
     }
   }
 
+  const handleGenerateGuide = async () => {
+    if (!recommendations || !formValues) return;
+    setIsGuideLoading(true);
+    setTrainingGuide(null);
+    try {
+        const guideResult = await getTrainingGuide({
+            crops: recommendations.crops.map(c => c.name),
+            gardenType: formValues.gardenType,
+        });
+        setTrainingGuide(guideResult);
+    } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : "An unknown error occurred.";
+        toast({
+            variant: "destructive",
+            title: "Could not generate guide",
+            description: errorMessage,
+        });
+    } finally {
+        setIsGuideLoading(false);
+    }
+  }
+
   return (
     <main className="container mx-auto px-4 py-12 md:py-20">
       <div className="mb-8">
@@ -187,7 +214,7 @@ export default function RecommendPage() {
       </header>
 
       <div className="max-w-3xl mx-auto">
-        <CropForm onSubmit={handleSubmit} isLoading={isLoading || isLayoutLoading || isDealersLoading} />
+        <CropForm onSubmit={handleSubmit} isLoading={isLoading || isLayoutLoading || isDealersLoading || isGuideLoading} />
       </div>
 
       {isLoading && <LoadingSkeletons />}
@@ -199,6 +226,10 @@ export default function RecommendPage() {
             onFindDealers={handleFindDealers}
             isDealersLoading={isDealersLoading}
             dealersFound={!!dealers}
+            gardenType={formValues?.gardenType}
+            onGenerateGuide={handleGenerateGuide}
+            isGuideLoading={isGuideLoading}
+            guideGenerated={!!trainingGuide}
           />
           {isLayoutLoading && <LayoutLoadingSkeleton />}
           {layout && !isLayoutLoading && <GardenLayoutDisplay data={layout} />}
@@ -211,6 +242,15 @@ export default function RecommendPage() {
             </div>
           )}
           {dealers && <DealersDisplay dealers={dealers} />}
+          {isGuideLoading && (
+            <div className="flex justify-center items-center gap-2 mt-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                <p className="text-center text-lg text-muted-foreground">
+                    Generating your training guide...
+                </p>
+            </div>
+          )}
+          {trainingGuide && !isGuideLoading && <TrainingGuideDisplay data={trainingGuide} />}
         </div>
       )}
     </main>

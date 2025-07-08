@@ -34,6 +34,9 @@ export const nutritionBaskets = {
 };
 
 const formSchema = z.object({
+  gardenType: z.enum(["family", "community"], {
+      required_error: "Please select a garden type."
+  }),
   landSize: z.string().min(1, "Land size is required."),
   region: z.string().min(1, "Region or county is required."),
   familySize: z.coerce.number().min(1, "Size must be at least 1."),
@@ -52,6 +55,7 @@ export function CropForm({ onSubmit, isLoading }: CropFormProps) {
   const form = useForm<CropFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      gardenType: "family",
       landSize: "",
       region: "",
       familySize: 1,
@@ -73,6 +77,33 @@ export function CropForm({ onSubmit, isLoading }: CropFormProps) {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="gardenType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Garden Type</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a garden type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="family">Family Garden</SelectItem>
+                      <SelectItem value="community">Community / School Garden</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Is this for a family or a larger group?
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="grid md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}

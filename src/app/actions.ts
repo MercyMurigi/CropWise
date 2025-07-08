@@ -9,6 +9,7 @@ import { generateGardenLayout, GenerateGardenLayoutInput } from '@/ai/flows/gene
 import { z } from 'zod';
 import type { CropFormValues } from '@/components/crop-form';
 import { findAgroDealers, FindAgroDealersOutput } from '@/ai/flows/find-agro-dealers';
+import { generateTrainingMaterials, GenerateTrainingMaterialsInput, GenerateTrainingMaterialsOutput } from '@/ai/flows/generate-training-materials';
 
 
 export type RecommendationResult = {
@@ -32,6 +33,8 @@ export type LayoutResult = {
 };
 
 export type DealerResult = FindAgroDealersOutput['dealers'];
+
+export type TrainingGuideResult = GenerateTrainingMaterialsOutput;
 
 const nutritionBasketMap = {
   general: "A balanced mix of essential vitamins and minerals for overall health.",
@@ -88,4 +91,14 @@ export async function getDealers(region: string): Promise<DealerResult> {
     throw new Error('The AI could not find any dealers for the selected region.');
   }
   return result.dealers;
+}
+
+export async function getTrainingGuide(
+  formData: GenerateTrainingMaterialsInput
+): Promise<TrainingGuideResult> {
+  const result = await generateTrainingMaterials(formData);
+  if (!result || !result.title) {
+    throw new Error('The AI could not generate a training guide. Please try again.');
+  }
+  return result;
 }
