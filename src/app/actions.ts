@@ -4,6 +4,7 @@ import {
   generateCropRecommendations,
   GenerateCropRecommendationsInput,
 } from '@/ai/flows/generate-crop-recommendations';
+import { diagnoseGarden, DiagnoseGardenInput } from '@/ai/flows/diagnose-garden';
 import { z } from 'zod';
 
 export type RecommendationResult = {
@@ -123,4 +124,15 @@ export async function getRecommendations(
     overallRationale: recommendations.overallRationale,
     crops: combinedCrops,
   };
+}
+
+
+export async function getGardenFeedback(
+  formData: DiagnoseGardenInput
+) {
+  const result = await diagnoseGarden(formData);
+  if (!result) {
+    throw new Error('Could not get feedback for your garden photo.');
+  }
+  return result;
 }

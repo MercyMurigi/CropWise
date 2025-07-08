@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import type { CropFormValues } from "@/components/crop-form";
 import { useToast } from "@/hooks/use-toast";
+import { SnapMyGarden } from "@/components/snap-my-garden";
 
 const LoadingSkeletons = () => (
   <div className="mt-12 space-y-8">
@@ -89,6 +90,10 @@ export default function Home() {
           <RecommendationsDisplay data={recommendations} />
         </div>
       )}
+
+      <div className="max-w-3xl mx-auto">
+        <SnapMyGarden />
+      </div>
     </main>
   );
 }
