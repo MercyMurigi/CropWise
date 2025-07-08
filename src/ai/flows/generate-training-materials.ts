@@ -65,11 +65,10 @@ Instructions:
     -   **Fun Fact (for community/school gardens):** An interesting fact about the plant.
 4.  Write a positive 'conclusion' to wrap up the guide.
 
-{{#if (eq gardenType "community")}}
-5.  Generate content for a printable 'poster'. The poster should have:
+If the 'gardenType' is "community", you MUST also generate content for a printable 'poster'. The poster should have:
     - A catchy 'title' related to the dietary goal. For example, if the goal is 'Child Health (U5)', the title could be "A Garden for Stronger Children!".
     - A short, motivational 'body' text encouraging the community to grow and eat these crops to meet their health goals.
-{{/if}}
+If the 'gardenType' is "family", you MUST OMIT the 'poster' field from the JSON output.
 
 Respond with a JSON object following the specified output schema.
 `,
