@@ -114,23 +114,23 @@ User's context:
 
 Please respond with a JSON object.
 
-The object must contain:
-1. "overallRationale": a string summarizing why this combination of crops is recommended for the user's specific context.
-2. "crops": an array of objects. Each object must have:
-   - "name": a string with the crop's name.
-   - "rationale": a CONCISE, 1-2 sentence string explaining the nutritional benefits of this crop and how it is suitable for the user's region, land size, and dietary needs.
-   - "imageKeywords": a string with one or two keywords for an image search of the crop (e.g., 'kale plant', 'carrot').
-   - "plantingInfo": an object with the following keys:
-     - "spacing": a string with the recommended spacing between plants.
-     - "maturity": a string indicating the time until harvest.
-     - "intercropping": a string with advice on companion plants.
+The object must contain the following top-level fields:
+- "overallRationale": A string summarizing why this combination of crops is recommended for the user's specific context.
+- "crops": An array of objects. Each object must have:
+  - "name": A string with the crop's name.
+  - "rationale": A CONCISE, 1-2 sentence string explaining the nutritional benefits of this crop and how it is suitable for the user's region, land size, and dietary needs.
+  - "imageKeywords": A string with one or two keywords for an image search of the crop (e.g., 'kale plant', 'carrot').
+  - "plantingInfo": An object with the following keys:
+    - "spacing": A string with the recommended spacing between plants.
+    - "maturity": A string indicating the time until harvest.
+    - "intercropping": A string with advice on companion plants.
 
 {{#if (eq gardenType "community")}}
-The JSON object MUST ALSO include these fields for community planning:
-3. "areaRequired": A string estimating the total land area required in square meters to feed the specified number of people.
-4. "seedQuantities": An array of objects, one for each recommended crop, with "cropName" and "quantity" (e.g., [{ "cropName": "Maize", "quantity": "500g" }]).
-5. "plantingSchedule": A string describing a simple, actionable planting schedule over a few weeks.
-6. "estimatedWeeklyYield": A string estimating the expected weekly harvest in kilograms once the crops mature.
+For community gardens, the JSON object MUST ALSO include these additional top-level fields:
+- "areaRequired": A string estimating the total land area required in square meters to feed the specified number of people.
+- "seedQuantities": An array of objects, one for each recommended crop, with "cropName" and "quantity" (e.g., [{ "cropName": "Maize", "quantity": "500g" }]).
+- "plantingSchedule": A string describing a simple, actionable planting schedule over a few weeks.
+- "estimatedWeeklyYield": A string estimating the expected weekly harvest in kilograms once the crops mature.
 {{/if}}
 
 It is crucial that you ALWAYS recommend at least three different crops and respond with a valid JSON object that strictly follows the format described.
