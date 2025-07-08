@@ -39,11 +39,10 @@ export function RecommendationsDisplay({ data }: RecommendationsDisplayProps) {
           <Card key={crop.name} className="flex flex-col bg-card/50 hover:bg-card/100 transition-colors duration-300 overflow-hidden">
             <div className="relative w-full aspect-[4/3]">
               <Image
-                src="https://placehold.co/400x300.png"
+                src={crop.imageDataUri}
                 alt={`Image of ${crop.name}`}
                 fill
                 className="object-cover"
-                data-ai-hint={crop.imageKeywords}
               />
             </div>
             <CardHeader>

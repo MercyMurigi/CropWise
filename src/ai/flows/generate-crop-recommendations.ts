@@ -24,6 +24,7 @@ export type GenerateCropRecommendationsInput = z.infer<
   typeof GenerateCropRecommendationsInputSchema
 >;
 
+// This is the final output schema with the image data URI
 const GenerateCropRecommendationsOutputSchema = z.object({
   overallRationale: z
     .string()
@@ -37,7 +38,7 @@ const GenerateCropRecommendationsOutputSchema = z.object({
           .describe(
             'A CONCISE, 1-2 sentence rationale for recommending this specific crop, highlighting its nutritional benefits and suitability for the provided context.'
           ),
-        imageKeywords: z.string().describe("One or two keywords for an image search of the crop (e.g., 'kale plant', 'carrot')."),
+        imageDataUri: z.string().describe("A data URI for a generated image of the crop."),
         plantingInfo: z.object({
           spacing: z.string().describe("Recommended spacing between plants (e.g., '30cm apart')."),
           maturity: z.string().describe("Time to maturity from planting (e.g., '60-80 days')."),
@@ -57,10 +58,27 @@ export async function generateCropRecommendations(
   return generateCropRecommendationsFlow(input);
 }
 
+
+// This schema is for the text-only prompt. It gets keywords we can use for image generation.
+const TextRecommendationsSchema = z.object({
+    overallRationale: z.string().describe('A summary rationale behind the recommended crop combination.'),
+    crops: z.array(z.object({
+        name: z.string().describe('The name of the recommended crop.'),
+        rationale: z.string().describe('A CONCISE, 1-2 sentence rationale for recommending this specific crop, highlighting its nutritional benefits and suitability for the provided context.'),
+        imageKeywords: z.string().describe("One or two keywords for an image search of the crop (e.g., 'kale plant', 'carrot')."),
+        plantingInfo: z.object({
+            spacing: z.string().describe("Recommended spacing between plants (e.g., '30cm apart')."),
+            maturity: z.string().describe("Time to maturity from planting (e.g., '60-80 days')."),
+            intercropping: z.string().describe("Advice on companion planting or intercropping (e.g., 'Good with beans and maize.')."),
+        }).describe("Detailed planting information for this specific crop.")
+    })).describe('An array of recommended crops, each with a name, rationale, and planting info. MUST contain at least 3 crops.'),
+});
+
+
 const prompt = ai.definePrompt({
   name: 'generateCropRecommendationsPrompt',
   input: {schema: GenerateCropRecommendationsInputSchema},
-  output: {schema: GenerateCropRecommendationsOutputSchema},
+  output: {schema: TextRecommendationsSchema}, // Use the text-only schema here
   prompt: `You are an expert in recommending crop combinations for home gardens, schools, and community farms, with deep knowledge of nutrition and sustainable agriculture.
 
 Your task is to suggest an optimized set of at least THREE crops that provide a balanced micronutrient supply based on the user's context. For each crop, you must also provide detailed planting information.
@@ -137,7 +155,37 @@ const generateCropRecommendationsFlow = ai.defineFlow(
     outputSchema: GenerateCropRecommendationsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    // 1. Get text-based recommendations first
+    const {output: textOutput} = await prompt(input);
+
+    if (!textOutput) {
+        throw new Error("Could not generate text recommendations.");
+    }
+    
+    // 2. Generate images in parallel for each crop
+    const imagePromises = textOutput.crops.map(async (crop) => {
+        const { media } = await ai.generate({
+            model: 'googleai/gemini-2.0-flash-preview-image-generation',
+            prompt: `A vibrant, high-quality photo of ${crop.imageKeywords} growing in a garden, suitable for a gardening app.`,
+            config: {
+                responseModalities: ['TEXT', 'IMAGE'],
+            },
+        });
+        
+        return {
+            name: crop.name,
+            rationale: crop.rationale,
+            plantingInfo: crop.plantingInfo,
+            imageDataUri: media?.url || 'https://placehold.co/400x300.png', // Fallback
+        };
+    });
+
+    const cropsWithImages = await Promise.all(imagePromises);
+
+    // 3. Assemble the final output
+    return {
+        overallRationale: textOutput.overallRationale,
+        crops: cropsWithImages,
+    };
   }
 );
