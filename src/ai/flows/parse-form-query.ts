@@ -15,7 +15,7 @@ const NUTRITION_BASKET_KEYS = ["general", "iron_rich", "vitamin_a", "child_healt
 const WATER_AVAILABILITY_KEYS = ["rainfed", "irrigated", "sack/bag garden", "balcony garden"];
 
 
-export const ParseFormQueryOutputSchema = z.object({
+const ParseFormQueryOutputSchema = z.object({
   landSize: z.string().optional().describe("The size of the land available for farming (e.g., '1/8 acre', '50 sqm')."),
   region: z.string().optional().describe('The region or county where the farm is located.'),
   familySize: z.number().optional().describe('The number of people in the family or group.'),
