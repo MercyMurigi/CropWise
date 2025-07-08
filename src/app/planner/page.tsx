@@ -6,15 +6,19 @@ export default function PlannerHubPage() {
   return (
     <>
       <header className="text-center mb-12">
-        <h1 className="text-5xl md:text-6xl font-headline font-bold text-primary mb-2">
+        <h1 className="text-5xl md:text-6xl font-headline font-bold text-primary mb-2 opacity-0 animate-fade-in-up">
           Garden Planner
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto opacity-0 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           Choose a tool below to start planning your thriving garden.
         </p>
       </header>
       <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        <Link href="/planner/recommend" className="group">
+        <Link 
+            href="/planner/recommend" 
+            className="group opacity-0 animate-fade-in-up" 
+            style={{ animationDelay: '0.2s' }}
+        >
           <Card className="h-full border-2 border-transparent group-hover:border-primary/50 group-hover:shadow-lg transition-all duration-300">
             <CardHeader className="flex-row items-center gap-4">
               <div className="bg-accent/20 text-accent rounded-full p-4">
@@ -34,8 +38,12 @@ export default function PlannerHubPage() {
             </CardContent>
           </Card>
         </Link>
-        <Link href="/planner/community" className="group">
-          <Card className="h-full border-2 border-primary/50 shadow-lg transition-all duration-300 ring-2 ring-primary">
+        <Link 
+            href="/planner/community" 
+            className="group opacity-0 animate-fade-in-up"
+            style={{ animationDelay: '0.3s' }}
+        >
+          <Card className="h-full border-2 border-transparent group-hover:border-primary/50 group-hover:shadow-lg transition-all duration-300">
             <CardHeader className="flex-row items-center gap-4">
               <div className="bg-accent/20 text-accent rounded-full p-4">
                 <Users className="h-8 w-8" />
@@ -54,7 +62,11 @@ export default function PlannerHubPage() {
             </CardContent>
           </Card>
         </Link>
-        <Link href="/planner/snap" className="group">
+        <Link 
+            href="/planner/snap" 
+            className="group opacity-0 animate-fade-in-up"
+            style={{ animationDelay: '0.4s' }}
+        >
           <Card className="h-full border-2 border-transparent group-hover:border-primary/50 group-hover:shadow-lg transition-all duration-300">
             <CardHeader className="flex-row items-center gap-4">
               <div className="bg-accent/20 text-accent rounded-full p-4">
