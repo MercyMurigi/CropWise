@@ -13,16 +13,25 @@ export default function LandingPage() {
             <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
               <div className="flex flex-col justify-center space-y-6">
                 <div className="space-y-4">
-                  <h1 className="text-5xl font-headline font-bold tracking-tighter text-primary sm:text-6xl xl:text-7xl/none">
+                  <h1
+                    className="text-5xl font-headline font-bold tracking-tighter text-primary sm:text-6xl xl:text-7xl/none opacity-0 animate-fade-in-up"
+                    style={{ animationDelay: '0.2s' }}
+                  >
                     Cultivate Your Perfect Garden
                   </h1>
-                  <p className="max-w-[600px] text-foreground/80 md:text-xl lg:text-lg xl:text-xl">
+                  <p
+                    className="max-w-[600px] text-foreground/80 md:text-xl lg:text-lg xl:text-xl opacity-0 animate-fade-in-up"
+                    style={{ animationDelay: '0.3s' }}
+                  >
                     Get AI-powered crop recommendations, visual planting guides, and expert feedback to grow a thriving, nutritious garden tailored to your family's needs.
                   </p>
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4 items-start">
+                <div
+                  className="flex flex-col sm:flex-row gap-4 items-start opacity-0 animate-fade-in-up"
+                  style={{ animationDelay: '0.4s' }}
+                >
                     <Link href="/planner">
-                    <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-8 py-6 text-lg">
+                    <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-8 py-6 text-lg animate-pulse-subtle">
                         Start Planning Your Garden
                         <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
@@ -48,17 +57,31 @@ export default function LandingPage() {
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center justify-center space-y-4 text-center">
                     <div className="space-y-4">
-                        <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary">Key Features</div>
-                        <h2 className="text-3xl font-headline font-bold tracking-tighter text-primary md:text-4xl/tight">
+                        <div
+                          className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary opacity-0 animate-fade-in-up"
+                          style={{ animationDelay: '0.5s' }}
+                        >
+                          Key Features
+                        </div>
+                        <h2
+                          className="text-3xl font-headline font-bold tracking-tighter text-primary md:text-4xl/tight opacity-0 animate-fade-in-up"
+                          style={{ animationDelay: '0.6s' }}
+                        >
                             Smart Tools for a Thriving Garden
                         </h2>
-                        <p className="mx-auto max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                        <p
+                          className="mx-auto max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed opacity-0 animate-fade-in-up"
+                          style={{ animationDelay: '0.7s' }}
+                        >
                             From intelligent planning to expert feedback, our app provides everything you need to cultivate a successful and nutritious garden with confidence.
                         </p>
                     </div>
                 </div>
                 <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-3 mt-12">
-                    <div className="grid gap-4 text-left p-6 rounded-lg bg-card/50 border border-transparent hover:border-primary/20 hover:bg-card transition-all duration-300">
+                    <div
+                      className="grid gap-4 text-left p-6 rounded-lg bg-card/50 border border-transparent hover:border-primary/20 hover:bg-card transition-all duration-300 opacity-0 animate-fade-in-up"
+                      style={{ animationDelay: '0.8s' }}
+                    >
                         <div className="bg-accent/20 text-accent rounded-full p-3 w-fit">
                             <Map className="h-6 w-6" />
                         </div>
@@ -67,7 +90,10 @@ export default function LandingPage() {
                             Generate a simple planting map based on your land size and chosen nutrition goals.
                         </p>
                     </div>
-                    <div className="grid gap-4 text-left p-6 rounded-lg bg-card/50 border border-transparent hover:border-primary/20 hover:bg-card transition-all duration-300">
+                    <div
+                      className="grid gap-4 text-left p-6 rounded-lg bg-card/50 border border-transparent hover:border-primary/20 hover:bg-card transition-all duration-300 opacity-0 animate-fade-in-up"
+                      style={{ animationDelay: '0.9s' }}
+                    >
                         <div className="bg-accent/20 text-accent rounded-full p-3 w-fit">
                             <Package className="h-6 w-6" />
                         </div>
@@ -76,7 +102,10 @@ export default function LandingPage() {
                             Order pre-packaged seed bundles or find nearby agro-dealers for easy pickup.
                         </p>
                     </div>
-                    <div className="grid gap-4 text-left p-6 rounded-lg bg-card/50 border border-transparent hover:border-primary/20 hover:bg-card transition-all duration-300">
+                    <div
+                      className="grid gap-4 text-left p-6 rounded-lg bg-card/50 border border-transparent hover:border-primary/20 hover:bg-card transition-all duration-300 opacity-0 animate-fade-in-up"
+                      style={{ animationDelay: '1.0s' }}
+                    >
                         <div className="bg-accent/20 text-accent rounded-full p-3 w-fit">
                              <Camera className="h-6 w-6" />
                         </div>
