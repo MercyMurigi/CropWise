@@ -1,13 +1,15 @@
 
 "use client";
 
+import { useState } from "react";
 import type { RecommendationResult } from "@/app/actions";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription
+  CardDescription,
+  CardFooter
 } from "@/components/ui/card";
 import {
   Accordion,
@@ -15,12 +17,16 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Sprout, Info, Dna, ShoppingCart, MapPin, Loader2, BookOpenCheck, FileText } from "lucide-react";
+import { Sprout, Info, Dna, ShoppingCart, MapPin, Loader2, BookOpenCheck, FileText, Utensils } from "lucide-react";
 import { Button } from "./ui/button";
 import Image from "next/image";
+import type { CropFormValues } from "./crop-form";
+import { nutritionBaskets } from "./crop-form";
+import { RecipeModal } from "./recipe-modal";
 
 interface RecommendationsDisplayProps {
   data: RecommendationResult;
+  formValues: CropFormValues | null;
   onFindDealers: () => void;
   isDealersLoading: boolean;
   dealersFound: boolean;
@@ -32,6 +38,7 @@ interface RecommendationsDisplayProps {
 
 export function RecommendationsDisplay({ 
   data, 
+  formValues,
   onFindDealers, 
   isDealersLoading, 
   dealersFound, 
@@ -40,6 +47,8 @@ export function RecommendationsDisplay({
   isGuideLoading, 
   guideGenerated 
 }: RecommendationsDisplayProps) {
+  const [selectedCrop, setSelectedCrop] = useState<string | null>(null);
+
   return (
     <section className="space-y-12">
       <div>
@@ -95,6 +104,11 @@ export function RecommendationsDisplay({
                 </AccordionItem>
               </Accordion>
             </CardContent>
+             <CardFooter className="p-4 pt-0 mt-auto border-t">
+                <Button variant="ghost" className="w-full text-primary hover:bg-primary/10" onClick={() => setSelectedCrop(crop.name)}>
+                    <Utensils className="mr-2 h-4 w-4"/> View Recipe
+                </Button>
+            </CardFooter>
           </Card>
         ))}
       </div>
@@ -155,6 +169,13 @@ export function RecommendationsDisplay({
             </Card>
         </div>
       )}
+
+      {formValues && <RecipeModal
+        open={!!selectedCrop}
+        onOpenChange={(isOpen) => !isOpen && setSelectedCrop(null)}
+        cropName={selectedCrop || ''}
+        nutritionContext={nutritionBaskets[formValues.dietaryNeeds]}
+      />}
     </section>
   );
 }

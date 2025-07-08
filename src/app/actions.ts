@@ -11,6 +11,8 @@ import { z } from 'zod';
 import type { CropFormValues } from '@/components/crop-form';
 import { findAgroDealers, FindAgroDealersOutput } from '@/ai/flows/find-agro-dealers';
 import { generateTrainingMaterials, GenerateTrainingMaterialsInput, GenerateTrainingMaterialsOutput } from '@/ai/flows/generate-training-materials';
+import { generateRecipe, GenerateRecipeInput, GenerateRecipeOutput } from '@/ai/flows/generate-recipe';
+import { textToSpeech, TextToSpeechInput, TextToSpeechOutput } from '@/ai/flows/text-to-speech';
 
 
 export type RecommendationResult = {
@@ -36,6 +38,10 @@ export type LayoutResult = {
 export type DealerResult = FindAgroDealersOutput['dealers'];
 
 export type TrainingGuideResult = GenerateTrainingMaterialsOutput;
+
+export type RecipeResult = GenerateRecipeOutput;
+
+export type AudioResult = TextToSpeechOutput;
 
 const nutritionBasketMap = {
   general: "A balanced mix of essential vitamins and minerals for overall health.",
@@ -100,6 +106,26 @@ export async function getTrainingGuide(
   const result = await generateTrainingMaterials(formData);
   if (!result || !result.title) {
     throw new Error('The AI could not generate a training guide. Please try again.');
+  }
+  return result;
+}
+
+export async function getRecipe(
+  formData: GenerateRecipeInput
+): Promise<RecipeResult> {
+  const result = await generateRecipe(formData);
+  if (!result || !result.title) {
+    throw new Error('The AI could not generate a recipe. Please try again.');
+  }
+  return result;
+}
+
+export async function getAudioForText(
+  formData: TextToSpeechInput
+): Promise<AudioResult> {
+  const result = await textToSpeech(formData);
+  if (!result || !result.audioDataUri) {
+    throw new Error('The AI could not generate audio. Please try again.');
   }
   return result;
 }

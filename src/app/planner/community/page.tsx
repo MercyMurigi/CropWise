@@ -206,6 +206,7 @@ export default function CommunityRecommendPage() {
         <div className="mt-16">
           <RecommendationsDisplay
             data={recommendations}
+            formValues={formValues}
             onFindDealers={handleFindDealers}
             isDealersLoading={isDealersLoading}
             dealersFound={!!dealers}
