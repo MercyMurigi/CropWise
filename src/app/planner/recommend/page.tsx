@@ -79,30 +79,22 @@ export default function RecommendPage() {
   const { toast } = useToast();
 
   const handleSubmit = async (formData: CropFormValues) => {
+    // 1. Reset all states and start the main loader
     setIsLoading(true);
     setRecommendations(null);
     setLayout(null);
+    
+    let recommendationsResult: RecommendationResult | null = null;
+    
+    // 2. Fetch crop recommendations
     try {
-      const result = await getRecommendations(formData);
-      if (!result || result.crops.length === 0) {
+      recommendationsResult = await getRecommendations(formData);
+      if (!recommendationsResult || recommendationsResult.crops.length === 0) {
         throw new Error(
           "Could not generate recommendations for the given input."
         );
       }
-      setRecommendations(result);
-      
-      setIsLayoutLoading(true);
-      const layoutResult = await getGardenLayout({
-          crops: result.crops.map(c => ({ 
-              name: c.name, 
-              spacing: c.plantingInfo.spacing, 
-              intercropping: c.plantingInfo.intercropping 
-            })),
-          landSize: formData.landSize,
-          plantingLocation: formData.waterAvailability,
-      });
-      setLayout(layoutResult);
-
+      setRecommendations(recommendationsResult);
     } catch (e) {
       const errorMessage =
         e instanceof Error ? e.message : "An unknown error occurred.";
@@ -112,8 +104,36 @@ export default function RecommendPage() {
         description: errorMessage,
       });
     } finally {
+      // 3. Stop the main loader regardless of success or failure
       setIsLoading(false);
-      setIsLayoutLoading(false);
+    }
+
+    // 4. If recommendations were successful, fetch the garden layout
+    if (recommendationsResult) {
+        setIsLayoutLoading(true);
+        try {
+            const layoutResult = await getGardenLayout({
+                crops: recommendationsResult.crops.map(c => ({ 
+                    name: c.name, 
+                    spacing: c.plantingInfo.spacing, 
+                    intercropping: c.plantingInfo.intercropping 
+                })),
+                landSize: formData.landSize,
+                plantingLocation: formData.waterAvailability,
+            });
+            setLayout(layoutResult);
+        } catch(e) {
+            const errorMessage =
+                e instanceof Error ? e.message : "An unknown error occurred.";
+            toast({
+                variant: "destructive",
+                title: "Layout generation failed",
+                description: errorMessage,
+            });
+            setLayout(null); // Ensure layout is cleared on error
+        } finally {
+            setIsLayoutLoading(false);
+        }
     }
   };
 
@@ -139,16 +159,16 @@ export default function RecommendPage() {
       </header>
 
       <div className="max-w-3xl mx-auto">
-        <CropForm onSubmit={handleSubmit} isLoading={isLoading} />
+        <CropForm onSubmit={handleSubmit} isLoading={isLoading || isLayoutLoading} />
       </div>
 
       {isLoading && <LoadingSkeletons />}
 
-      {recommendations && (
+      {recommendations && !isLoading && (
         <div className="mt-16">
           <RecommendationsDisplay data={recommendations} />
           {isLayoutLoading && <LayoutLoadingSkeleton />}
-          {layout && <GardenLayoutDisplay data={layout} />}
+          {layout && !isLayoutLoading && <GardenLayoutDisplay data={layout} />}
         </div>
       )}
     </main>
