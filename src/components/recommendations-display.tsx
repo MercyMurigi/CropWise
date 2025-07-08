@@ -97,26 +97,26 @@ export function RecommendationsDisplay({
             <CardTitle className="font-headline text-3xl">Bulk Planning Details</CardTitle>
             <CardDescription>Key metrics for planning your community or school garden.</CardDescription>
           </CardHeader>
-          <CardContent className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
-            <div className="p-4 bg-background rounded-lg">
+          <CardContent className="grid md:grid-cols-2 gap-6">
+            <div className="p-4 bg-background rounded-lg text-center">
               <Square className="mx-auto h-8 w-8 text-accent mb-2"/>
               <h4 className="font-bold text-lg">Area Required</h4>
-              <p className="text-xl text-primary font-semibold">{data.areaRequired}</p>
+              <p className="text-2xl text-primary font-semibold">{data.areaRequired}</p>
             </div>
-             <div className="p-4 bg-background rounded-lg">
+             <div className="p-4 bg-background rounded-lg text-center">
               <TrendingUp className="mx-auto h-8 w-8 text-accent mb-2"/>
               <h4 className="font-bold text-lg">Est. Weekly Yield</h4>
-              <p className="text-xl text-primary font-semibold">{data.estimatedWeeklyYield}</p>
+              <p className="text-2xl text-primary font-semibold">{data.estimatedWeeklyYield}</p>
             </div>
-            <div className="p-4 bg-background rounded-lg">
-                <Package className="mx-auto h-8 w-8 text-accent mb-2"/>
+            <div className="p-4 bg-background rounded-lg text-left">
+                <Package className="h-8 w-8 text-accent mb-2"/>
                 <h4 className="font-bold text-lg">Seed Quantities</h4>
-                <ul className="text-sm text-muted-foreground">
+                <ul className="text-sm text-muted-foreground list-disc list-inside">
                     {data.seedQuantities?.map(s => <li key={s.cropName}>{s.cropName}: {s.quantity}</li>)}
                 </ul>
             </div>
-            <div className="p-4 bg-background rounded-lg">
-              <CalendarDays className="mx-auto h-8 w-8 text-accent mb-2"/>
+            <div className="p-4 bg-background rounded-lg text-left">
+              <CalendarDays className="h-8 w-8 text-accent mb-2"/>
               <h4 className="font-bold text-lg">Planting Schedule</h4>
               <p className="text-sm text-muted-foreground">{data.plantingSchedule}</p>
             </div>

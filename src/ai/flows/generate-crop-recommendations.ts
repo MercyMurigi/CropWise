@@ -128,7 +128,7 @@ The object must contain the following top-level fields:
 If the 'gardenType' is "community", you MUST include the following additional properties in the root of the JSON object. If the 'gardenType' is "family", you MUST OMIT them.
 - "areaRequired": (string) An estimation of the total land area required in square meters.
 - "seedQuantities": (array of objects) An array providing the estimated seed quantity for each recommended crop. Each object in the array MUST have two keys: "cropName" (string) and "quantity" (string). For example: \`[{"cropName": "Kale", "quantity": "200g"}, {"cropName": "Carrots", "quantity": "300g"}]\`.
-- "plantingSchedule": (string) A simple, actionable weekly planting schedule.
+- "plantingSchedule": (string) A simple, actionable, week-by-week planting schedule. For example: "Week 1: Prepare beds and sow Kale seeds. Week 2: Sow Carrot seeds. Week 3: Monitor germination."
 - "estimatedWeeklyYield": (string) An estimation of the weekly harvest yield in kilograms.
 
 It is crucial that you ALWAYS recommend at least three different crops and respond with a valid JSON object that strictly follows the format described.
