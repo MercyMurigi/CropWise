@@ -6,6 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription
 } from "@/components/ui/card";
 import {
   Accordion,
@@ -13,7 +14,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Sprout, Info, Dna } from "lucide-react";
+import { Sprout, Info, Dna, ShoppingCart, MapPin } from "lucide-react";
+import { Button } from "./ui/button";
 
 interface RecommendationsDisplayProps {
   data: RecommendationResult;
@@ -77,6 +79,30 @@ export function RecommendationsDisplay({ data }: RecommendationsDisplayProps) {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      <div className="mt-16">
+          <Card className="border-2 border-primary/20 shadow-lg shadow-primary/5 text-center">
+            <CardHeader>
+                <div className="mx-auto bg-accent/20 text-accent rounded-full p-3 w-fit mb-2">
+                    <ShoppingCart className="h-6 w-6" />
+                </div>
+                <CardTitle className="font-headline text-3xl">
+                    Get Your Seed Bundles
+                </CardTitle>
+                <CardDescription>
+                    Ready to start planting? Order your recommended seeds online or find a local dealer.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" disabled>
+                    <ShoppingCart className="mr-2" /> Order for Delivery (Coming Soon)
+                </Button>
+                <Button size="lg" variant="secondary" disabled>
+                    <MapPin className="mr-2" /> Find a Local Dealer (Coming Soon)
+                </Button>
+            </CardContent>
+          </Card>
       </div>
     </section>
   );
