@@ -48,16 +48,25 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateCropRecommendationsOutputSchema},
   prompt: `You are an expert in recommending crop combinations for home gardens, schools, and community farms.
 
-  Based on the following information, suggest an optimized set of crops that provide a balanced micronutrient supply.
+Your task is to suggest an optimized set of crops that provide a balanced micronutrient supply based on the user's context.
 
-  Land Size: {{{landSize}}}
-  Region: {{{region}}}
-  Family Size: {{{familySize}}}
-  Dietary Needs: {{{dietaryNeeds}}}
-  Water Availability: {{{waterAvailability}}}
+User's context:
+- Land Size: {{{landSize}}}
+- Region: {{{region}}}
+- Family Size: {{{familySize}}}
+- Dietary Needs: {{{dietaryNeeds}}}
+- Water Availability: {{{waterAvailability}}}
 
-  Respond with an array of crops and a rationale for the recommendation.
-  `,
+Please respond with a JSON object containing two keys:
+1. "crops": an array of strings, where each string is a recommended crop.
+2. "rationale": a string explaining why this combination of crops is recommended for the given context.
+
+Example output format:
+{
+  "crops": ["Kale", "Spinach", "Carrots"],
+  "rationale": "This combination provides a good mix of vitamins A and C, is suitable for the specified region, and can be grown in the available land size."
+}
+`,
 });
 
 const generateCropRecommendationsFlow = ai.defineFlow(

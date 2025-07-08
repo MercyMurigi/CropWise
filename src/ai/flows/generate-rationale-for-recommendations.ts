@@ -41,14 +41,16 @@ Dietary Needs: {{{dietaryNeeds}}}
 
 Crop Recommendations: {{#each cropRecommendations}}{{{this}}}, {{/each}}
 
-For each crop, explain its nutritional benefits and how it addresses the specified dietary needs in the context of the provided information. Return a JSON object where each key is the crop name and the value is the rationale.
+For each crop, explain its nutritional benefits and how it addresses the specified dietary needs in the context of the provided information.
 
-Output the rationale as a JSON object:
+Return a JSON object with a single key "rationale". The value of "rationale" should be another JSON object where each key is a crop name and the value is the rationale for that crop.
 
+Example output format:
 {
-  "crop1": "rationale1",
-  "crop2": "rationale2",
-  ...
+  "rationale": {
+    "crop1": "Rationale for crop1...",
+    "crop2": "Rationale for crop2..."
+  }
 }
 `,
 });
