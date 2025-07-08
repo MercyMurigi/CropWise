@@ -22,8 +22,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mic, MicOff } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useEffect, useRef, useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { parseQueryForForm } from "@/app/actions";
 
 export const nutritionBaskets = {
   general: "General Nutrition",
@@ -61,6 +64,80 @@ export function CropForm({ onSubmit, isLoading, isCommunity = false }: CropFormP
     },
   });
 
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      console.warn("Speech recognition not supported in this browser.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognitionRef.current = recognition;
+
+    recognition.onresult = async (event) => {
+        const query = event.results[0][0].transcript;
+        toast({ title: "Thinking...", description: `You said: "${query}"` });
+        
+        try {
+            const parsedData = await parseQueryForForm(query);
+            for (const [key, value] of Object.entries(parsedData)) {
+                if (value !== undefined) {
+                    form.setValue(key as keyof CropFormValues, value as any);
+                }
+            }
+            toast({
+                title: "Form Updated!",
+                description: "I've filled in the form with what I understood. Please review and submit.",
+            });
+        } catch (e) {
+            const errorMessage = e instanceof Error ? e.message : "Could not process your request.";
+            toast({ variant: 'destructive', title: 'Sorry, I had trouble understanding.', description: errorMessage });
+        } finally {
+            setIsListening(false);
+        }
+    };
+
+    recognition.onerror = (event) => {
+        console.error("Speech recognition error", event.error);
+        toast({ variant: 'destructive', title: 'Speech Recognition Error', description: event.error });
+        setIsListening(false);
+    };
+
+    recognition.onend = () => {
+        setIsListening(false);
+    };
+
+  }, [form, toast]);
+
+  const handleMicClick = () => {
+      if (!recognitionRef.current) {
+          toast({
+              variant: 'destructive',
+              title: 'Not Supported',
+              description: 'Voice input is not supported on your browser.',
+          });
+          return;
+      }
+      if (isListening) {
+          recognitionRef.current.stop();
+          setIsListening(false);
+      } else {
+          recognitionRef.current.start();
+          setIsListening(true);
+      }
+  };
+
+
   return (
     <Card className="border-2 border-primary/20 shadow-lg shadow-primary/5">
       <CardHeader>
@@ -68,7 +145,7 @@ export function CropForm({ onSubmit, isLoading, isCommunity = false }: CropFormP
           Plan Your Garden
         </CardTitle>
         <CardDescription>
-            Fill in the details below to get personalized crop recommendations.
+            Fill in the details below or use the microphone to get personalized crop recommendations.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -183,20 +260,33 @@ export function CropForm({ onSubmit, isLoading, isCommunity = false }: CropFormP
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-accent text-accent-foreground hover:bg-accent/90 text-lg py-6"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                "Get Recommendations"
-              )}
-            </Button>
+            <div className="flex items-stretch gap-4">
+              <Button
+                type="submit"
+                disabled={isLoading || isListening}
+                className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 text-lg py-6"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  "Get Recommendations"
+                )}
+              </Button>
+               {!isCommunity && <Button 
+                  type="button" 
+                  size="icon" 
+                  variant={isListening ? "destructive" : "outline"} 
+                  onClick={handleMicClick} 
+                  title="Use Voice Input"
+                  disabled={isLoading}
+                  className="w-16 h-auto"
+              >
+                  {isListening ? <MicOff className="h-6 w-6 animate-pulse" /> : <Mic className="h-6 w-6" />}
+              </Button>}
+            </div>
           </form>
         </Form>
       </CardContent>

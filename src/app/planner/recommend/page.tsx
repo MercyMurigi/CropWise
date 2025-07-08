@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { CropForm } from "@/components/crop-form";
 import { RecommendationsDisplay } from "@/components/recommendations-display";
-import { getRecommendations, RecommendationResult, getGardenLayout, LayoutResult, getDealers, DealerResult } from "@/app/actions";
+import { getRecommendations, RecommendationResult, getGardenLayout, LayoutResult, getDealers, DealerResult, getAudioForText } from "@/app/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
@@ -78,6 +78,8 @@ export default function RecommendPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLayoutLoading, setIsLayoutLoading] = useState(false);
   const [isDealersLoading, setIsDealersLoading] = useState(false);
+  const [isAudioLoading, setIsAudioLoading] = useState(false);
+  const [responseAudioUri, setResponseAudioUri] = useState<string | null>(null);
 
 
   const { toast } = useToast();
@@ -88,6 +90,7 @@ export default function RecommendPage() {
     setLayout(null);
     setDealers(null);
     setFormValues(formData);
+    setResponseAudioUri(null);
     
     let recommendationsResult: RecommendationResult | null = null;
     
@@ -113,6 +116,7 @@ export default function RecommendPage() {
 
     if (recommendationsResult) {
         setIsLayoutLoading(true);
+        setIsAudioLoading(true);
         try {
             const layoutResult = await getGardenLayout({
                 crops: recommendationsResult.crops.map(c => ({ 
@@ -135,6 +139,16 @@ export default function RecommendPage() {
             setLayout(null);
         } finally {
             setIsLayoutLoading(false);
+        }
+
+        try {
+          const summaryText = `${recommendationsResult.overallRationale} I recommend planting: ${recommendationsResult.crops.map(c => c.name).join(', ')}.`;
+          const audioResult = await getAudioForText({ text: summaryText });
+          setResponseAudioUri(audioResult.audioDataUri);
+        } catch (e) {
+          console.error("Failed to generate audio response", e);
+        } finally {
+          setIsAudioLoading(false);
         }
     }
   };
@@ -184,6 +198,8 @@ export default function RecommendPage() {
             onFindDealers={handleFindDealers}
             isDealersLoading={isDealersLoading}
             dealersFound={!!dealers}
+            audioDataUri={responseAudioUri}
+            isAudioLoading={isAudioLoading}
           />
           {isLayoutLoading && <LayoutLoadingSkeleton />}
           {layout && !isLayoutLoading && <GardenLayoutDisplay data={layout} />}

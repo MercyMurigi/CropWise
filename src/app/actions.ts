@@ -13,6 +13,7 @@ import { findAgroDealers, FindAgroDealersOutput } from '@/ai/flows/find-agro-dea
 import { generateTrainingMaterials, GenerateTrainingMaterialsInput, GenerateTrainingMaterialsOutput } from '@/ai/flows/generate-training-materials';
 import { generateRecipe, GenerateRecipeInput, GenerateRecipeOutput } from '@/ai/flows/generate-recipe';
 import { textToSpeech, TextToSpeechInput, TextToSpeechOutput } from '@/ai/flows/text-to-speech';
+import { parseFormQuery, ParseFormQueryOutput } from '@/ai/flows/parse-form-query';
 
 
 export type RecommendationResult = {
@@ -42,6 +43,9 @@ export type TrainingGuideResult = GenerateTrainingMaterialsOutput;
 export type RecipeResult = GenerateRecipeOutput;
 
 export type AudioResult = TextToSpeechOutput;
+
+export type ParsedFormResult = ParseFormQueryOutput;
+
 
 const nutritionBasketMap = {
   general: "A balanced mix of essential vitamins and minerals for overall health.",
@@ -128,4 +132,12 @@ export async function getAudioForText(
     throw new Error('The AI could not generate audio. Please try again.');
   }
   return result;
+}
+
+export async function parseQueryForForm(query: string): Promise<ParsedFormResult> {
+    const result = await parseFormQuery({ query });
+    if (!result) {
+        throw new Error('Could not understand the query. Please try again.');
+    }
+    return result;
 }

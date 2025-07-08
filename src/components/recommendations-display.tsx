@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { RecommendationResult } from "@/app/actions";
 import {
   Card,
@@ -17,7 +17,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Sprout, Info, Dna, ShoppingCart, MapPin, Loader2, BookOpenCheck, FileText, Utensils } from "lucide-react";
+import { Sprout, Info, Dna, ShoppingCart, MapPin, Loader2, BookOpenCheck, FileText, Utensils, Volume2, Pause } from "lucide-react";
 import { Button } from "./ui/button";
 import Image from "next/image";
 import type { CropFormValues } from "./crop-form";
@@ -34,6 +34,8 @@ interface RecommendationsDisplayProps {
   onGenerateGuide?: () => void;
   isGuideLoading?: boolean;
   guideGenerated?: boolean;
+  audioDataUri: string | null;
+  isAudioLoading: boolean;
 }
 
 export function RecommendationsDisplay({ 
@@ -45,16 +47,45 @@ export function RecommendationsDisplay({
   gardenType, 
   onGenerateGuide, 
   isGuideLoading, 
-  guideGenerated 
+  guideGenerated,
+  audioDataUri,
+  isAudioLoading
 }: RecommendationsDisplayProps) {
   const [selectedCrop, setSelectedCrop] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    const a = audioRef.current;
+    if (audioDataUri && a) {
+        a.src = audioDataUri;
+        a.play().catch(e => console.error("Audio autoplay failed.", e));
+    }
+  }, [audioDataUri]);
+
+  const togglePlay = () => {
+    const a = audioRef.current;
+    if (!a) return;
+    if (isPlaying) {
+      a.pause();
+    } else {
+      a.play();
+    }
+  }
 
   return (
     <section className="space-y-12">
       <div>
-        <h2 className="text-3xl md:text-4xl font-headline font-bold text-center text-primary">
-          Your Personalized Crop Plan
-        </h2>
+        <div className="flex justify-center items-center gap-4">
+          <h2 className="text-3xl md:text-4xl font-headline font-bold text-center text-primary">
+            Your Personalized Crop Plan
+          </h2>
+          {(isAudioLoading || audioDataUri) && (
+              <Button size="icon" variant="outline" onClick={togglePlay} disabled={isAudioLoading} title={isPlaying ? "Pause summary" : "Play summary"}>
+                  {isAudioLoading ? <Loader2 className="animate-spin" /> : (isPlaying ? <Pause/> : <Volume2/>)}
+              </Button>
+          )}
+        </div>
         <p className="mt-2 text-center text-lg text-muted-foreground max-w-3xl mx-auto">
           {data.overallRationale}
         </p>
@@ -176,6 +207,8 @@ export function RecommendationsDisplay({
         cropName={selectedCrop || ''}
         nutritionContext={nutritionBaskets[formValues.dietaryNeeds]}
       />}
+
+      <audio ref={audioRef} className="hidden" onPlay={() => setIsPlaying(true)} onPause={() => setIsPlaying(false)} onEnded={() => setIsPlaying(false)} />
     </section>
   );
 }
