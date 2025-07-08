@@ -25,7 +25,7 @@ const FormSchema = z.object({
   region: z.string(),
   familySize: z.coerce.number(),
   dietaryNeeds: z.string(),
-  waterAvailability: z.enum(['rainfed', 'irrigated', 'sack/bag garden']),
+  waterAvailability: z.enum(['rainfed', 'irrigated', 'sack/bag garden', 'balcony garden']),
 });
 
 const plantingInfoDatabase: {

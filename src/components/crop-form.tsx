@@ -30,7 +30,7 @@ const formSchema = z.object({
   region: z.string().min(1, "Region or county is required."),
   familySize: z.coerce.number().min(1, "Size must be at least 1."),
   dietaryNeeds: z.string().min(1, "Please describe dietary needs."),
-  waterAvailability: z.enum(["rainfed", "irrigated", "sack/bag garden"]),
+  waterAvailability: z.enum(["rainfed", "irrigated", "sack/bag garden", "balcony garden"]),
 });
 
 export type CropFormValues = z.infer<typeof formSchema>;
@@ -117,26 +117,29 @@ export function CropForm({ onSubmit, isLoading }: CropFormProps) {
                 name="waterAvailability"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Water Availability</FormLabel>
+                    <FormLabel>Planting Location</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a water source" />
+                          <SelectValue placeholder="Select a location" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="rainfed">Rain-fed</SelectItem>
-                        <SelectItem value="irrigated">Irrigated</SelectItem>
+                        <SelectItem value="rainfed">On Ground (Rain-fed)</SelectItem>
+                        <SelectItem value="irrigated">On Ground (Irrigated)</SelectItem>
                         <SelectItem value="sack/bag garden">
                           Sack/Bag Garden
+                        </SelectItem>
+                        <SelectItem value="balcony garden">
+                          Balcony Garden
                         </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      How you will water your garden.
+                      Where you will be planting.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

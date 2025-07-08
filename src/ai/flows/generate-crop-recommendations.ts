@@ -17,7 +17,7 @@ const GenerateCropRecommendationsInputSchema = z.object({
   familySize: z.number().describe('The number of people in the family.'),
   dietaryNeeds: z.string().describe('Specific dietary needs or restrictions of the family.'),
   waterAvailability: z
-    .enum(['rainfed', 'irrigated', 'sack/bag garden'])
+    .enum(['rainfed', 'irrigated', 'sack/bag garden', 'balcony garden'])
     .describe('The type of water setup available.'),
 });
 export type GenerateCropRecommendationsInput = z.infer<
@@ -58,6 +58,12 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert in recommending crop combinations for home gardens, schools, and community farms, with deep knowledge of nutrition.
 
 Your task is to suggest an optimized set of at least THREE crops that provide a balanced micronutrient supply based on the user's context. Be creative and ensure the recommendations are well-suited for the given conditions.
+
+Context for water availability options:
+- rainfed: crops are watered by natural rainfall.
+- irrigated: crops are watered through an irrigation system.
+- sack/bag garden: crops are grown in sacks or bags, suitable for small spaces.
+- balcony garden: crops are grown in containers on a balcony.
 
 User's context:
 - Land Size: {{{landSize}}}
