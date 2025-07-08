@@ -1,11 +1,13 @@
+
 'use server';
 
 import {
   generateCropRecommendations,
-  GenerateCropRecommendationsInput,
 } from '@/ai/flows/generate-crop-recommendations';
 import { diagnoseGarden, DiagnoseGardenInput } from '@/ai/flows/diagnose-garden';
+import { generateGardenLayout, GenerateGardenLayoutInput } from '@/ai/flows/generate-garden-layout';
 import { z } from 'zod';
+import type { CropFormValues } from '@/components/crop-form';
 
 export type RecommendationResult = {
   overallRationale: string;
@@ -20,13 +22,19 @@ export type RecommendationResult = {
   }[];
 };
 
-const FormSchema = z.object({
-  landSize: z.string(),
-  region: z.string(),
-  familySize: z.coerce.number(),
-  dietaryNeeds: z.string(),
-  waterAvailability: z.enum(['rainfed', 'irrigated', 'sack/bag garden', 'balcony garden']),
-});
+export type LayoutResult = {
+  layout: string[][];
+  description: string;
+  legend: Record<string, string>;
+};
+
+const nutritionBasketMap = {
+  general: "A balanced mix of essential vitamins and minerals for overall health.",
+  iron_rich: "Focus on iron-rich crops to help combat anemia and boost energy levels.",
+  vitamin_a: "Focus on crops rich in Vitamin A to support vision and immune function.",
+  child_health: "Crops that provide key nutrients for growth and development in children under 5.",
+  maternal_health: "Nutrient-dense crops to support the health of pregnant and lactating mothers."
+};
 
 const plantingInfoDatabase: {
   [key: string]: RecommendationResult['crops'][0]['plantingInfo'];
@@ -99,11 +107,15 @@ const plantingInfoDatabase: {
 };
 
 export async function getRecommendations(
-  formData: GenerateCropRecommendationsInput
+  formData: CropFormValues
 ): Promise<RecommendationResult> {
-  const validatedData = FormSchema.parse(formData);
 
-  const recommendations = await generateCropRecommendations(validatedData);
+  const dietaryNeedsDescription = nutritionBasketMap[formData.dietaryNeeds] || formData.dietaryNeeds;
+
+  const recommendations = await generateCropRecommendations({
+      ...formData,
+      dietaryNeeds: dietaryNeedsDescription
+  });
 
   if (!recommendations || !recommendations.crops || recommendations.crops.length === 0) {
     throw new Error('The AI could not generate recommendations for the provided data. Please try adjusting your inputs.');
@@ -126,7 +138,6 @@ export async function getRecommendations(
   };
 }
 
-
 export async function getGardenFeedback(
   formData: DiagnoseGardenInput
 ) {
@@ -135,4 +146,17 @@ export async function getGardenFeedback(
     throw new Error('Could not get feedback for your garden photo.');
   }
   return result;
+}
+
+export async function getGardenLayout(
+  formData: GenerateGardenLayoutInput
+): Promise<LayoutResult> {
+
+  const layoutData = await generateGardenLayout(formData);
+
+  if (!layoutData || !layoutData.layout || layoutData.layout.length === 0) {
+    throw new Error('The AI could not generate a garden layout. Please try again.');
+  }
+
+  return layoutData;
 }

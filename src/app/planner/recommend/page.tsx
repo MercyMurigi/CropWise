@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { CropForm } from "@/components/crop-form";
 import { RecommendationsDisplay } from "@/components/recommendations-display";
-import { getRecommendations, RecommendationResult } from "@/app/actions";
+import { getRecommendations, RecommendationResult, getGardenLayout, LayoutResult } from "@/app/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { GardenLayoutDisplay } from "@/components/garden-layout-display";
 
 const LoadingSkeletons = () => (
   <div className="mt-12 space-y-8">
@@ -40,15 +41,47 @@ const LoadingSkeletons = () => (
   </div>
 );
 
+const LayoutLoadingSkeleton = () => (
+    <div className="mt-8">
+         <div className="flex justify-center items-center gap-2 mb-4">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <p className="text-center text-lg text-muted-foreground">
+                Creating your visual garden map...
+            </p>
+        </div>
+        <Card>
+            <CardHeader>
+                <Skeleton className="h-8 w-1/2" />
+                <Skeleton className="h-4 w-3/4" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid grid-cols-8 gap-1">
+                    {[...Array(64)].map((_, i) => (
+                        <Skeleton key={i} className="aspect-square" />
+                    ))}
+                </div>
+                 <div className="flex flex-wrap gap-x-4 gap-y-2">
+                    <Skeleton className="h-5 w-20" />
+                    <Skeleton className="h-5 w-24" />
+                    <Skeleton className="h-5 w-20" />
+                 </div>
+            </CardContent>
+        </Card>
+    </div>
+)
+
 export default function RecommendPage() {
   const [recommendations, setRecommendations] =
     useState<RecommendationResult | null>(null);
+  const [layout, setLayout] = useState<LayoutResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLayoutLoading, setIsLayoutLoading] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (formData: CropFormValues) => {
     setIsLoading(true);
     setRecommendations(null);
+    setLayout(null);
     try {
       const result = await getRecommendations(formData);
       if (!result || result.crops.length === 0) {
@@ -57,6 +90,19 @@ export default function RecommendPage() {
         );
       }
       setRecommendations(result);
+      
+      setIsLayoutLoading(true);
+      const layoutResult = await getGardenLayout({
+          crops: result.crops.map(c => ({ 
+              name: c.name, 
+              spacing: c.plantingInfo.spacing, 
+              intercropping: c.plantingInfo.intercropping 
+            })),
+          landSize: formData.landSize,
+          plantingLocation: formData.waterAvailability,
+      });
+      setLayout(layoutResult);
+
     } catch (e) {
       const errorMessage =
         e instanceof Error ? e.message : "An unknown error occurred.";
@@ -67,6 +113,7 @@ export default function RecommendPage() {
       });
     } finally {
       setIsLoading(false);
+      setIsLayoutLoading(false);
     }
   };
 
@@ -100,6 +147,8 @@ export default function RecommendPage() {
       {recommendations && (
         <div className="mt-16">
           <RecommendationsDisplay data={recommendations} />
+          {isLayoutLoading && <LayoutLoadingSkeleton />}
+          {layout && <GardenLayoutDisplay data={layout} />}
         </div>
       )}
     </main>

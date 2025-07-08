@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,15 +22,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+
+export const nutritionBaskets = {
+  general: "General Nutrition",
+  iron_rich: "Iron-Rich Boost",
+  vitamin_a: "Vitamin A Boost",
+  child_health: "Child Health (U5)",
+  maternal_health: "Maternal Health"
+};
 
 const formSchema = z.object({
   landSize: z.string().min(1, "Land size is required."),
   region: z.string().min(1, "Region or county is required."),
   familySize: z.coerce.number().min(1, "Size must be at least 1."),
-  dietaryNeeds: z.string().min(1, "Please describe dietary needs."),
+  dietaryNeeds: z.enum(Object.keys(nutritionBaskets) as [keyof typeof nutritionBaskets, ...(keyof typeof nutritionBaskets)[]]),
   waterAvailability: z.enum(["rainfed", "irrigated", "sack/bag garden", "balcony garden"]),
 });
 
@@ -47,7 +55,7 @@ export function CropForm({ onSubmit, isLoading }: CropFormProps) {
       landSize: "",
       region: "",
       familySize: 1,
-      dietaryNeeds: "",
+      dietaryNeeds: "general",
       waterAvailability: "rainfed",
     },
   });
@@ -151,16 +159,24 @@ export function CropForm({ onSubmit, isLoading }: CropFormProps) {
               name="dietaryNeeds"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Dietary Needs</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="e.g., Pregnant mother, children under 5, iron deficiency"
-                      className="min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
+                  <FormLabel>Nutrition Goal</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a nutrition goal" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {Object.entries(nutritionBaskets).map(([key, value]) => (
+                        <SelectItem key={key} value={key}>{value}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormDescription>
-                    List any specific nutritional requirements.
+                    Choose a nutritional focus for your garden.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
