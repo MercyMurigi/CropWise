@@ -4,7 +4,6 @@ import {
   generateCropRecommendations,
   GenerateCropRecommendationsInput,
 } from '@/ai/flows/generate-crop-recommendations';
-import { generateRationale } from '@/ai/flows/generate-rationale-for-recommendations';
 import { z } from 'zod';
 
 export type RecommendationResult = {
@@ -103,35 +102,25 @@ export async function getRecommendations(
 ): Promise<RecommendationResult> {
   const validatedData = FormSchema.parse(formData);
 
-  const cropRecommendations = await generateCropRecommendations(validatedData);
+  const recommendations = await generateCropRecommendations(validatedData);
 
-  if (!cropRecommendations.crops || cropRecommendations.crops.length === 0) {
+  if (!recommendations || !recommendations.crops || recommendations.crops.length === 0) {
     throw new Error('The AI could not generate recommendations for the provided data. Please try adjusting your inputs.');
   }
 
-  const rationaleInput = {
-    ...validatedData,
-    familySize: validatedData.familySize.toString(),
-    cropRecommendations: cropRecommendations.crops,
-  };
-
-  const detailedRationales = await generateRationale(rationaleInput);
-
-  const combinedCrops = cropRecommendations.crops.map((cropName) => {
-    const lowerCaseCrop = cropName.toLowerCase();
+  const combinedCrops = recommendations.crops.map((crop) => {
+    const lowerCaseCrop = crop.name.toLowerCase();
     const info =
       plantingInfoDatabase[lowerCaseCrop] || plantingInfoDatabase['default'];
     return {
-      name: cropName,
-      rationale:
-        detailedRationales.rationale[cropName] ||
-        'A highly nutritious and resilient crop suitable for your conditions.',
+      name: crop.name,
+      rationale: crop.rationale,
       plantingInfo: info,
     };
   });
 
   return {
-    overallRationale: cropRecommendations.rationale,
+    overallRationale: recommendations.overallRationale,
     crops: combinedCrops,
   };
 }
