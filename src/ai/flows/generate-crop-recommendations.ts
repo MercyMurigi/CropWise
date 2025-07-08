@@ -107,44 +107,7 @@ Please respond with a JSON object. This object should contain:
      - "maturity": a string indicating the time until harvest.
      - "intercropping": a string with advice on companion plants.
 
-It is crucial that you ALWAYS recommend at least three different crops.
-
-Example output format:
-{
-  "overallRationale": "This combination of Kale, Carrots, and Beans offers a balanced nutritional profile rich in vitamins, iron, and protein. It is well-suited for a small, irrigated plot in your region and provides key nutrients for maternal health.",
-  "crops": [
-    {
-      "name": "Kale",
-      "rationale": "Kale is a nutritional powerhouse, rich in vitamins K, A, and C, supporting bone health and immunity. It's a hardy crop that grows well in your specified region.",
-      "imageKeywords": "kale plant",
-      "plantingInfo": {
-        "spacing": "45cm apart",
-        "maturity": "55-75 days",
-        "intercropping": "Grows well with onions and herbs, which can help deter pests."
-      }
-    },
-    {
-      "name": "Carrots",
-      "rationale": "Carrots are an excellent source of Vitamin A, essential for vision and immune function. They are suitable for the land size and grow well in irrigated conditions.",
-      "imageKeywords": "carrots",
-      "plantingInfo": {
-        "spacing": "5-8cm apart",
-        "maturity": "70-80 days",
-        "intercropping": "Planting with rosemary or sage can help deter the carrot rust fly."
-      }
-    },
-    {
-      "name": "Beans (Bush variety)",
-      "rationale": "Beans are a fantastic source of plant-based protein and iron, crucial for combating anemia. They also fix nitrogen in the soil, improving its fertility.",
-      "imageKeywords": "bush beans",
-      "plantingInfo": {
-        "spacing": "10-15cm apart",
-        "maturity": "60-80 days",
-        "intercropping": "A classic companion to maize and squash, but also grows well alongside carrots."
-      }
-    }
-  ]
-}
+It is crucial that you ALWAYS recommend at least three different crops and respond with a valid JSON object that strictly follows the format described.
 `,
 });
 
@@ -158,25 +121,36 @@ const generateCropRecommendationsFlow = ai.defineFlow(
     // 1. Get text-based recommendations first
     const {output: textOutput} = await prompt(input);
 
-    if (!textOutput) {
-        throw new Error("Could not generate text recommendations.");
+    if (!textOutput || !textOutput.crops || textOutput.crops.length === 0) {
+        throw new Error("Could not generate text recommendations. The AI did not return the expected data.");
     }
     
-    // 2. Generate images in parallel for each crop
+    // 2. Generate images in parallel for each crop, with error handling for each
     const imagePromises = textOutput.crops.map(async (crop) => {
-        const { media } = await ai.generate({
-            model: 'googleai/gemini-2.0-flash-preview-image-generation',
-            prompt: `A vibrant, high-quality photo of ${crop.imageKeywords} growing in a garden, suitable for a gardening app.`,
-            config: {
-                responseModalities: ['TEXT', 'IMAGE'],
-            },
-        });
+        let imageDataUri = `https://placehold.co/400x300.png?text=${crop.name.replace(/\s/g, '+')}`; // Default fallback
+        
+        try {
+            const { media } = await ai.generate({
+                model: 'googleai/gemini-2.0-flash-preview-image-generation',
+                prompt: `A vibrant, high-quality photo of ${crop.imageKeywords} growing in a garden, suitable for a gardening app.`,
+                config: {
+                    responseModalities: ['TEXT', 'IMAGE'],
+                },
+            });
+
+            if (media?.url) {
+                imageDataUri = media.url;
+            }
+        } catch (error) {
+            console.error(`Failed to generate image for "${crop.name}". Using fallback. Error:`, error);
+            // imageDataUri remains the default fallback
+        }
         
         return {
             name: crop.name,
             rationale: crop.rationale,
             plantingInfo: crop.plantingInfo,
-            imageDataUri: media?.url || 'https://placehold.co/400x300.png', // Fallback
+            imageDataUri: imageDataUri,
         };
     });
 
