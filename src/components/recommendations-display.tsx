@@ -18,20 +18,28 @@ import {
 import { Sprout, Info, Dna, ShoppingCart, MapPin, Loader2, BookOpenCheck, FileText } from "lucide-react";
 import { Button } from "./ui/button";
 import Image from "next/image";
-import type { CropFormValues } from "./crop-form";
 
 interface RecommendationsDisplayProps {
   data: RecommendationResult;
   onFindDealers: () => void;
   isDealersLoading: boolean;
   dealersFound: boolean;
-  gardenType?: CropFormValues['gardenType'];
-  onGenerateGuide: () => void;
-  isGuideLoading: boolean;
-  guideGenerated: boolean;
+  gardenType?: 'family' | 'community';
+  onGenerateGuide?: () => void;
+  isGuideLoading?: boolean;
+  guideGenerated?: boolean;
 }
 
-export function RecommendationsDisplay({ data, onFindDealers, isDealersLoading, dealersFound, gardenType, onGenerateGuide, isGuideLoading, guideGenerated }: RecommendationsDisplayProps) {
+export function RecommendationsDisplay({ 
+  data, 
+  onFindDealers, 
+  isDealersLoading, 
+  dealersFound, 
+  gardenType, 
+  onGenerateGuide, 
+  isGuideLoading, 
+  guideGenerated 
+}: RecommendationsDisplayProps) {
   return (
     <section className="space-y-12">
       <div>
@@ -61,7 +69,7 @@ export function RecommendationsDisplay({ data, onFindDealers, isDealersLoading, 
               <p className="text-muted-foreground flex-grow mb-4">{crop.rationale}</p>
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-1">
-                  <AccordionTrigger className="text-base font-bold hover:no-underline">
+                  <AccordionTrigger className="text-base font-bold hover:no-underline text-primary/80">
                     Planting Guide
                   </AccordionTrigger>
                   <AccordionContent className="space-y-3 pt-2 text-muted-foreground">
@@ -120,7 +128,7 @@ export function RecommendationsDisplay({ data, onFindDealers, isDealersLoading, 
           </Card>
       </div>
 
-      {gardenType === 'community' && (
+      {gardenType === 'community' && onGenerateGuide && (
         <div className="mt-16">
             <Card className="border-2 border-primary/20 shadow-lg shadow-primary/5 text-center">
                 <CardHeader>

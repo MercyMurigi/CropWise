@@ -26,7 +26,7 @@ export default function PlannerHubPage() {
         </Card>
       </Link>
       <Link href="/planner/community" className="group">
-        <Card className="h-full border-2 border-primary/50 shadow-lg transition-all duration-300 ring-2 ring-accent">
+        <Card className="h-full border-2 border-primary/50 shadow-lg transition-all duration-300 ring-2 ring-primary">
           <CardHeader className="flex-row items-center gap-4">
              <div className="bg-accent/20 text-accent rounded-full p-4">
               <Users className="h-8 w-8" />

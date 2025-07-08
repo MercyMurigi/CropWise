@@ -6,6 +6,15 @@ import type { TrainingGuideResult } from "@/app/actions";
 import { Printer } from "lucide-react";
 
 export function TrainingGuideDisplay({ data }: { data: TrainingGuideResult }) {
+  
+  const handlePrint = () => {
+    // Temporarily add a class to body to apply print-specific styles from globals.css
+    document.body.classList.add('printing-guide');
+    window.print();
+    // Remove the class after printing dialog is closed
+    setTimeout(() => document.body.classList.remove('printing-guide'), 1);
+  };
+  
   return (
     <div className="mt-8 printable-guide-container">
       <Card className="border-2 border-primary/20 shadow-lg shadow-primary/5">
@@ -15,7 +24,7 @@ export function TrainingGuideDisplay({ data }: { data: TrainingGuideResult }) {
                     <CardTitle className="font-headline text-3xl">Your Training Guide</CardTitle>
                     <CardDescription>A printable guide for your garden. Click the print button to get a physical copy.</CardDescription>
                 </div>
-                 <Button variant="outline" className="print-button ml-4" onClick={() => window.print()}>
+                 <Button variant="outline" className="print-button ml-4" onClick={handlePrint}>
                     <Printer className="mr-2 h-4 w-4" /> Print Guide
                 </Button>
             </div>
@@ -28,44 +37,47 @@ export function TrainingGuideDisplay({ data }: { data: TrainingGuideResult }) {
                 </div>
 
                 {data.sections.map((section, index) => (
-                    <div key={index} className="break-after-page">
+                    <div key={index} className="break-inside-avoid pt-6">
                         <h3 className="font-headline text-2xl text-primary mb-4 border-b pb-2">{section.cropName}</h3>
-                        <div className="prose prose-sm max-w-none text-muted-foreground whitespace-pre-line"
-                            dangerouslySetInnerHTML={{ __html: section.content }}/>
+                        <div className="prose prose-sm max-w-none text-foreground/90" 
+                             dangerouslySetInnerHTML={{ __html: section.content.replace(/\n/g, '<br />').replace(/\*(.*?)\*/g, '<li>$1</li>').replace(/(\*\*.*?\*\*)/g, '<strong>$1</strong>') }} />
                     </div>
                 ))}
                 
-                <div className="pt-4">
-                    <h3 className="font-headline text-2xl text-primary mb-2 border-b pb-2">Conclusion</h3>
+                <div className="pt-8 mt-8 border-t">
+                    <h3 className="font-headline text-2xl text-primary mb-2">Conclusion</h3>
                     <p className="text-muted-foreground">{data.conclusion}</p>
                 </div>
             </CardContent>
         </div>
       </Card>
-      <style jsx global>{`
+       <style jsx global>{`
         @media print {
-            body * {
-                visibility: hidden;
+            body > *:not(.printable-guide-container) {
+                display: none;
             }
-            #guide-content, #guide-content * {
-                visibility: visible;
-            }
-            #guide-content {
+            .printable-guide-container {
                 position: absolute;
                 left: 0;
                 top: 0;
                 width: 100%;
-                padding: 1rem;
             }
-            .print-button {
-                display: none;
+            main {
+                padding: 0 !important;
             }
-            @page {
+            #guide-content {
+                visibility: visible;
+                padding: 0;
+            }
+             .print-button, header, .back-button {
+                display: none !important;
+            }
+            .break-inside-avoid {
+                page-break-inside: avoid;
+            }
+             @page {
                 size: auto;
-                margin: 0.5in;
-            }
-            .break-after-page {
-                page-break-after: always;
+                margin: 0.75in;
             }
         }
       `}</style>

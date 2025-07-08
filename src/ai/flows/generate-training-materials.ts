@@ -21,7 +21,7 @@ const GenerateTrainingMaterialsOutputSchema = z.object({
   introduction: z.string().describe("A brief introductory paragraph for the guide."),
   sections: z.array(z.object({
       cropName: z.string().describe("The name of the crop this section is about."),
-      content: z.string().describe("The training content for this crop. Use newlines for formatting. Include information on planting, watering, pest control, and harvesting. Tailor the tone for the specified garden type (e.g., educational and simple for schools).")
+      content: z.string().describe("The training content for this crop. Use Markdown for formatting (e.g., **bold** for titles, * for list items). Include information on planting, watering, pest control, and harvesting. Tailor the tone for the specified garden type (e.g., educational and simple for schools).")
   })),
   conclusion: z.string().describe("A concluding paragraph to encourage the gardeners.")
 });
@@ -39,7 +39,7 @@ const prompt = ai.definePrompt({
 
 The guide should be easy to understand for beginners, including teachers, community health workers, or families.
 
-If the garden type is "community", write the guide with a tone suitable for teaching groups or children. Use simple language and focus on the educational aspects. Use formatting like titles with ** and lists with *.
+If the garden type is "community", write the guide with a tone suitable for teaching groups or children. Use simple language and focus on the educational aspects. Use Markdown formatting like **Bold Titles** and * for lists.
 If the garden type is "family", the tone can be more direct and focused on home gardening success.
 
 Crops to cover:
