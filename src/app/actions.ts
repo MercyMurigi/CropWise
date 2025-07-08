@@ -14,6 +14,7 @@ export type RecommendationResult = {
   crops: {
     name: string;
     rationale: string;
+    imageKeywords: string;
     plantingInfo: {
       spacing: string;
       maturity: string;

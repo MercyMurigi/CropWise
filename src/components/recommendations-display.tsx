@@ -16,15 +16,11 @@ import {
 } from "@/components/ui/accordion";
 import { Sprout, Info, Dna, ShoppingCart, MapPin } from "lucide-react";
 import { Button } from "./ui/button";
+import Image from "next/image";
 
 interface RecommendationsDisplayProps {
   data: RecommendationResult;
 }
-
-const getIconForCrop = (cropName: string) => {
-  // This can be expanded to return different icons based on crop type
-  return <Sprout className="h-8 w-8 text-primary" />;
-};
 
 export function RecommendationsDisplay({ data }: RecommendationsDisplayProps) {
   return (
@@ -40,14 +36,20 @@ export function RecommendationsDisplay({ data }: RecommendationsDisplayProps) {
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {data.crops.map((crop) => (
-          <Card key={crop.name} className="flex flex-col bg-card/50 hover:bg-card/100 transition-colors duration-300">
-            <CardHeader className="flex-row items-center gap-4 space-y-0 pb-4">
-              {getIconForCrop(crop.name)}
-              <div className="flex-1">
-                <CardTitle className="font-headline text-2xl">{crop.name}</CardTitle>
-              </div>
+          <Card key={crop.name} className="flex flex-col bg-card/50 hover:bg-card/100 transition-colors duration-300 overflow-hidden">
+            <div className="relative w-full aspect-[4/3]">
+              <Image
+                src="https://placehold.co/400x300.png"
+                alt={`Image of ${crop.name}`}
+                fill
+                className="object-cover"
+                data-ai-hint={crop.imageKeywords}
+              />
+            </div>
+            <CardHeader>
+              <CardTitle className="font-headline text-2xl">{crop.name}</CardTitle>
             </CardHeader>
-            <CardContent className="flex-grow flex flex-col">
+            <CardContent className="flex-grow flex flex-col pt-0">
               <p className="text-muted-foreground flex-grow mb-4">{crop.rationale}</p>
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="item-1">

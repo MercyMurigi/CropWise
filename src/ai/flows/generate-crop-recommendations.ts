@@ -35,8 +35,9 @@ const GenerateCropRecommendationsOutputSchema = z.object({
         rationale: z
           .string()
           .describe(
-            'The rationale for recommending this specific crop, highlighting its nutritional benefits and suitability for the provided context.'
+            'A CONCISE, 1-2 sentence rationale for recommending this specific crop, highlighting its nutritional benefits and suitability for the provided context.'
           ),
+        imageKeywords: z.string().describe("One or two keywords for an image search of the crop (e.g., 'kale plant', 'carrot')."),
         plantingInfo: z.object({
           spacing: z.string().describe("Recommended spacing between plants (e.g., '30cm apart')."),
           maturity: z.string().describe("Time to maturity from planting (e.g., '60-80 days')."),
@@ -81,7 +82,8 @@ Please respond with a JSON object. This object should contain:
 1. "overallRationale": a string summarizing why this combination of crops is recommended for the user's specific context.
 2. "crops": an array of objects. Each object must have:
    - "name": a string with the crop's name.
-   - "rationale": a string explaining the nutritional benefits of this crop and how it is suitable for the user's region, land size, and dietary needs.
+   - "rationale": a CONCISE, 1-2 sentence string explaining the nutritional benefits of this crop and how it is suitable for the user's region, land size, and dietary needs.
+   - "imageKeywords": a string with one or two keywords for an image search of the crop (e.g., 'kale plant', 'carrot').
    - "plantingInfo": an object with the following keys:
      - "spacing": a string with the recommended spacing between plants.
      - "maturity": a string indicating the time until harvest.
@@ -95,7 +97,8 @@ Example output format:
   "crops": [
     {
       "name": "Kale",
-      "rationale": "Kale is a nutritional powerhouse, rich in vitamins K, A, and C. It supports bone health and boosts immunity, which is highly beneficial during pregnancy. It's a hardy crop that grows well in your specified region.",
+      "rationale": "Kale is a nutritional powerhouse, rich in vitamins K, A, and C, supporting bone health and immunity. It's a hardy crop that grows well in your specified region.",
+      "imageKeywords": "kale plant",
       "plantingInfo": {
         "spacing": "45cm apart",
         "maturity": "55-75 days",
@@ -104,7 +107,8 @@ Example output format:
     },
     {
       "name": "Carrots",
-      "rationale": "Carrots are an excellent source of beta-carotene (Vitamin A), essential for vision and immune function for both mother and child. They are suitable for the land size and grow well in irrigated conditions.",
+      "rationale": "Carrots are an excellent source of Vitamin A, essential for vision and immune function. They are suitable for the land size and grow well in irrigated conditions.",
+      "imageKeywords": "carrots",
       "plantingInfo": {
         "spacing": "5-8cm apart",
         "maturity": "70-80 days",
@@ -113,11 +117,12 @@ Example output format:
     },
     {
       "name": "Beans (Bush variety)",
-      "rationale": "Beans are a fantastic source of plant-based protein and iron, crucial for combating anemia and supporting fetal development. They also fix nitrogen in the soil, improving its fertility for other plants.",
+      "rationale": "Beans are a fantastic source of plant-based protein and iron, crucial for combating anemia. They also fix nitrogen in the soil, improving its fertility.",
+      "imageKeywords": "bush beans",
       "plantingInfo": {
         "spacing": "10-15cm apart",
         "maturity": "60-80 days",
-        "intercropping": "A classic companion to maize and squash (Three Sisters method), but also grows well alongside carrots."
+        "intercropping": "A classic companion to maize and squash, but also grows well alongside carrots."
       }
     }
   ]
