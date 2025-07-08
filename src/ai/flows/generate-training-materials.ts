@@ -13,6 +13,7 @@ import {z} from 'genkit';
 const GenerateTrainingMaterialsInputSchema = z.object({
   crops: z.array(z.string()).describe("A list of crop names."),
   gardenType: z.enum(['family', 'community']).describe("The type of garden this guide is for."),
+  dietaryNeeds: z.string().describe("The primary nutritional goal for the garden, e.g., 'Child Health (U5)' or 'Iron-Rich Boost'."),
 });
 export type GenerateTrainingMaterialsInput = z.infer<typeof GenerateTrainingMaterialsInputSchema>;
 
@@ -23,7 +24,11 @@ const GenerateTrainingMaterialsOutputSchema = z.object({
       cropName: z.string().describe("The name of the crop this section is about."),
       content: z.string().describe("The training content for this crop. Use Markdown for formatting (e.g., **bold** for titles, * for list items). Include information on planting, watering, pest control, and harvesting. Tailor the tone for the specified garden type (e.g., educational and simple for schools).")
   })),
-  conclusion: z.string().describe("A concluding paragraph to encourage the gardeners.")
+  conclusion: z.string().describe("A concluding paragraph to encourage the gardeners."),
+  poster: z.object({
+    title: z.string().describe("A catchy, encouraging title for a nutrition poster, related to the dietary goal (e.g., 'Grow These for a Stronger Child!')."),
+    body: z.string().describe("A short, encouraging body text for the poster, highlighting the benefits of the recommended crops for the specified dietary need."),
+  }).optional().describe("Content for a printable nutrition poster. Should only be generated for community gardens.")
 });
 export type GenerateTrainingMaterialsOutput = z.infer<typeof GenerateTrainingMaterialsOutputSchema>;
 
@@ -48,6 +53,7 @@ Crops to cover:
 {{/each}}
 
 Garden Type: {{{gardenType}}}
+Dietary Goal: {{{dietaryNeeds}}}
 
 Instructions:
 1.  Create a catchy 'title' for the guide.
@@ -58,6 +64,12 @@ Instructions:
     -   **Harvesting:** When and how to harvest.
     -   **Fun Fact (for community/school gardens):** An interesting fact about the plant.
 4.  Write a positive 'conclusion' to wrap up the guide.
+
+{{#if (eq gardenType "community")}}
+5.  Generate content for a printable 'poster'. The poster should have:
+    - A catchy 'title' related to the dietary goal. For example, if the goal is 'Child Health (U5)', the title could be "A Garden for Stronger Children!".
+    - A short, motivational 'body' text encouraging the community to grow and eat these crops to meet their health goals.
+{{/if}}
 
 Respond with a JSON object following the specified output schema.
 `,

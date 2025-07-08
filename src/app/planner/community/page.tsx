@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { CropForm } from "@/components/crop-form";
+import { CropForm, nutritionBaskets } from "@/components/crop-form";
 import { RecommendationsDisplay } from "@/components/recommendations-display";
 import { getRecommendations, RecommendationResult, getGardenLayout, LayoutResult, getDealers, DealerResult, getTrainingGuide, TrainingGuideResult } from "@/app/actions";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,7 +19,7 @@ const LoadingSkeletons = () => (
     <div className="flex justify-center items-center gap-2 mb-4">
       <Loader2 className="h-6 w-6 animate-spin text-primary" />
       <p className="text-center text-lg text-muted-foreground">
-        Generating your group's crop plan...
+        Generating your group's detailed crop plan...
       </p>
     </div>
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -171,6 +171,7 @@ export default function CommunityRecommendPage() {
         const guideResult = await getTrainingGuide({
             crops: recommendations.crops.map(c => c.name),
             gardenType: 'community',
+            dietaryNeeds: nutritionBaskets[formValues.dietaryNeeds]
         });
         setTrainingGuide(guideResult);
     } catch (e) {
@@ -214,6 +215,8 @@ export default function CommunityRecommendPage() {
             onGenerateGuide={handleGenerateGuide}
             isGuideLoading={isGuideLoading}
             guideGenerated={!!trainingGuide}
+            audioDataUri={null}
+            isAudioLoading={false}
           />
           {isLayoutLoading && <LayoutLoadingSkeleton />}
           {layout && !isLayoutLoading && <GardenLayoutDisplay data={layout} />}

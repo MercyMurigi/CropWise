@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { TrainingGuideResult } from "@/app/actions";
-import { Printer } from "lucide-react";
+import { Printer, Sparkles } from "lucide-react";
 
 export function TrainingGuideDisplay({ data }: { data: TrainingGuideResult }) {
   
@@ -35,6 +35,20 @@ export function TrainingGuideDisplay({ data }: { data: TrainingGuideResult }) {
                     <h2 className="font-headline text-4xl text-primary">{data.title}</h2>
                     <p className="mt-2 text-muted-foreground max-w-3xl mx-auto">{data.introduction}</p>
                 </div>
+
+                {data.poster && (
+                    <div className="break-inside-avoid my-8">
+                        <Card className="bg-accent/10 border-accent border-2">
+                           <CardHeader className="text-center">
+                                <Sparkles className="mx-auto h-8 w-8 text-accent mb-2" />
+                                <CardTitle className="font-headline text-3xl text-accent">{data.poster.title}</CardTitle>
+                           </CardHeader>
+                           <CardContent>
+                                <p className="text-center text-accent-foreground/80 text-lg">{data.poster.body}</p>
+                           </CardContent>
+                        </Card>
+                    </div>
+                )}
 
                 {data.sections.map((section, index) => (
                     <div key={index} className="break-inside-avoid pt-6">

@@ -4,6 +4,7 @@
 import {
   generateCropRecommendations,
   GenerateCropRecommendationsInput,
+  GenerateCropRecommendationsOutput,
 } from '@/ai/flows/generate-crop-recommendations';
 import { diagnoseGarden, DiagnoseGardenInput } from '@/ai/flows/diagnose-garden';
 import { generateGardenLayout, GenerateGardenLayoutInput } from '@/ai/flows/generate-garden-layout';
@@ -16,19 +17,7 @@ import { textToSpeech, TextToSpeechInput, TextToSpeechOutput } from '@/ai/flows/
 import { parseFormQuery, ParseFormQueryOutput } from '@/ai/flows/parse-form-query';
 
 
-export type RecommendationResult = {
-  overallRationale: string;
-  crops: {
-    name: string;
-    rationale: string;
-    imageDataUri: string;
-    plantingInfo: {
-      spacing: string;
-      maturity: string;
-      intercropping: string;
-    };
-  }[];
-};
+export type RecommendationResult = GenerateCropRecommendationsOutput;
 
 export type LayoutResult = {
   layout: string[][];

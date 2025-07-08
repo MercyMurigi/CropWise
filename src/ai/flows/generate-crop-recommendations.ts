@@ -49,6 +49,11 @@ const GenerateCropRecommendationsOutputSchema = z.object({
       })
     )
     .describe('An array of recommended crops, each with a name, rationale, and planting info. MUST contain at least 3 crops.'),
+  // New optional fields for community plan
+  areaRequired: z.string().optional().describe("The estimated land area required in square meters."),
+  seedQuantities: z.array(z.object({ cropName: z.string(), quantity: z.string() })).optional().describe("Estimated seed quantity needed for each crop."),
+  plantingSchedule: z.string().optional().describe("A simple weekly planting schedule."),
+  estimatedWeeklyYield: z.string().optional().describe("An estimation of the weekly harvest yield.")
 });
 export type GenerateCropRecommendationsOutput = z.infer<
   typeof GenerateCropRecommendationsOutputSchema
@@ -74,6 +79,11 @@ const TextRecommendationsSchema = z.object({
             intercropping: z.string().describe("Advice on companion planting or intercropping (e.g., 'Good with beans and maize.')."),
         }).describe("Detailed planting information for this specific crop.")
     })).describe('An array of recommended crops, each with a name, rationale, and planting info. MUST contain at least 3 crops.'),
+    // New optional fields for community plan
+    areaRequired: z.string().optional().describe("The estimated land area required in square meters."),
+    seedQuantities: z.array(z.object({ cropName: z.string(), quantity: z.string() })).optional().describe("Estimated seed quantity needed for each crop."),
+    plantingSchedule: z.string().optional().describe("A simple weekly planting schedule."),
+    estimatedWeeklyYield: z.string().optional().describe("An estimation of the weekly harvest yield.")
 });
 
 
@@ -85,7 +95,7 @@ const prompt = ai.definePrompt({
 
 Your task is to suggest an optimized set of at least THREE crops that provide a balanced micronutrient supply based on the user's context. Your recommendations should be suitable for the given region and planting month, considering typical weather patterns like rainy or dry seasons. For each crop, you must also provide detailed planting information.
 
-If the user specifies a "community" garden type, your recommendations should be suitable for a larger group, potentially for educational purposes. Focus on crops that are resilient, have a good yield, and are easy to manage for groups. For a "family" garden, tailor the recommendations to a smaller scale.
+If the user specifies a "community" garden type, your recommendations must be suitable for a larger group and include detailed planning information. For a "family" garden, tailor the recommendations to a smaller scale.
 
 Context for water availability options:
 - rainfed: crops are watered by natural rainfall.
@@ -102,7 +112,9 @@ User's context:
 - Dietary Needs: {{{dietaryNeeds}}}
 - Water Availability: {{{waterAvailability}}}
 
-Please respond with a JSON object. This object should contain:
+Please respond with a JSON object.
+
+The object must contain:
 1. "overallRationale": a string summarizing why this combination of crops is recommended for the user's specific context.
 2. "crops": an array of objects. Each object must have:
    - "name": a string with the crop's name.
@@ -112,6 +124,14 @@ Please respond with a JSON object. This object should contain:
      - "spacing": a string with the recommended spacing between plants.
      - "maturity": a string indicating the time until harvest.
      - "intercropping": a string with advice on companion plants.
+
+{{#if (eq gardenType "community")}}
+The JSON object MUST ALSO include these fields for community planning:
+3. "areaRequired": A string estimating the total land area required in square meters to feed the specified number of people.
+4. "seedQuantities": An array of objects, one for each recommended crop, with "cropName" and "quantity" (e.g., "500g").
+5. "plantingSchedule": A string describing a simple, actionable planting schedule over a few weeks.
+6. "estimatedWeeklyYield": A string estimating the expected weekly harvest in kilograms once the crops mature.
+{{/if}}
 
 It is crucial that you ALWAYS recommend at least three different crops and respond with a valid JSON object that strictly follows the format described.
 `,
@@ -166,6 +186,10 @@ const generateCropRecommendationsFlow = ai.defineFlow(
     return {
         overallRationale: textOutput.overallRationale,
         crops: cropsWithImages,
+        areaRequired: textOutput.areaRequired,
+        seedQuantities: textOutput.seedQuantities,
+        plantingSchedule: textOutput.plantingSchedule,
+        estimatedWeeklyYield: textOutput.estimatedWeeklyYield,
     };
   }
 );

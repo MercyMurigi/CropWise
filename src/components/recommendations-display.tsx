@@ -17,7 +17,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Sprout, Info, Dna, ShoppingCart, MapPin, Loader2, BookOpenCheck, FileText, Utensils, Volume2, Pause } from "lucide-react";
+import { Sprout, Info, Dna, ShoppingCart, MapPin, Loader2, BookOpenCheck, FileText, Utensils, Volume2, Pause, Square, Package, CalendarDays, TrendingUp } from "lucide-react";
 import { Button } from "./ui/button";
 import Image from "next/image";
 import type { CropFormValues } from "./crop-form";
@@ -78,7 +78,7 @@ export function RecommendationsDisplay({
       <div>
         <div className="flex justify-center items-center gap-4">
           <h2 className="text-3xl md:text-4xl font-headline font-bold text-center text-primary">
-            Your Personalized Crop Plan
+            {gardenType === 'community' ? 'Your Community Garden Plan' : 'Your Personalized Crop Plan'}
           </h2>
           {(isAudioLoading || audioDataUri) && (
               <Button size="icon" variant="outline" onClick={togglePlay} disabled={isAudioLoading} title={isPlaying ? "Pause summary" : "Play summary"}>
@@ -90,6 +90,39 @@ export function RecommendationsDisplay({
           {data.overallRationale}
         </p>
       </div>
+
+       {gardenType === 'community' && (
+        <Card className="border-2 border-primary/20 shadow-lg shadow-primary/5">
+          <CardHeader>
+            <CardTitle className="font-headline text-3xl">Bulk Planning Details</CardTitle>
+            <CardDescription>Key metrics for planning your community or school garden.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+            <div className="p-4 bg-background rounded-lg">
+              <Square className="mx-auto h-8 w-8 text-accent mb-2"/>
+              <h4 className="font-bold text-lg">Area Required</h4>
+              <p className="text-xl text-primary font-semibold">{data.areaRequired}</p>
+            </div>
+             <div className="p-4 bg-background rounded-lg">
+              <TrendingUp className="mx-auto h-8 w-8 text-accent mb-2"/>
+              <h4 className="font-bold text-lg">Est. Weekly Yield</h4>
+              <p className="text-xl text-primary font-semibold">{data.estimatedWeeklyYield}</p>
+            </div>
+            <div className="p-4 bg-background rounded-lg">
+                <Package className="mx-auto h-8 w-8 text-accent mb-2"/>
+                <h4 className="font-bold text-lg">Seed Quantities</h4>
+                <ul className="text-sm text-muted-foreground">
+                    {data.seedQuantities?.map(s => <li key={s.cropName}>{s.cropName}: {s.quantity}</li>)}
+                </ul>
+            </div>
+            <div className="p-4 bg-background rounded-lg">
+              <CalendarDays className="mx-auto h-8 w-8 text-accent mb-2"/>
+              <h4 className="font-bold text-lg">Planting Schedule</h4>
+              <p className="text-sm text-muted-foreground">{data.plantingSchedule}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {data.crops.map((crop) => (
