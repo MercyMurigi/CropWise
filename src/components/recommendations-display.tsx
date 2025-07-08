@@ -14,15 +14,18 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Sprout, Info, Dna, ShoppingCart, MapPin } from "lucide-react";
+import { Sprout, Info, Dna, ShoppingCart, MapPin, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
 import Image from "next/image";
 
 interface RecommendationsDisplayProps {
   data: RecommendationResult;
+  onFindDealers: () => void;
+  isDealersLoading: boolean;
+  dealersFound: boolean;
 }
 
-export function RecommendationsDisplay({ data }: RecommendationsDisplayProps) {
+export function RecommendationsDisplay({ data, onFindDealers, isDealersLoading, dealersFound }: RecommendationsDisplayProps) {
   return (
     <section className="space-y-12">
       <div>
@@ -99,8 +102,13 @@ export function RecommendationsDisplay({ data }: RecommendationsDisplayProps) {
                 <Button size="lg" disabled>
                     <ShoppingCart className="mr-2" /> Order for Delivery (Coming Soon)
                 </Button>
-                <Button size="lg" variant="secondary" disabled>
-                    <MapPin className="mr-2" /> Find a Local Dealer (Coming Soon)
+                <Button size="lg" variant="secondary" onClick={onFindDealers} disabled={isDealersLoading || dealersFound}>
+                    {isDealersLoading ? (
+                        <Loader2 className="mr-2 animate-spin" />
+                    ) : (
+                        <MapPin className="mr-2" />
+                    )}
+                    {dealersFound ? 'Dealers Found Below' : 'Find a Local Dealer'}
                 </Button>
             </CardContent>
           </Card>

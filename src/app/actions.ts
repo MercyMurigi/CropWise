@@ -8,6 +8,8 @@ import { diagnoseGarden, DiagnoseGardenInput } from '@/ai/flows/diagnose-garden'
 import { generateGardenLayout, GenerateGardenLayoutInput } from '@/ai/flows/generate-garden-layout';
 import { z } from 'zod';
 import type { CropFormValues } from '@/components/crop-form';
+import { findAgroDealers, FindAgroDealersOutput } from '@/ai/flows/find-agro-dealers';
+
 
 export type RecommendationResult = {
   overallRationale: string;
@@ -28,6 +30,8 @@ export type LayoutResult = {
   description: string;
   legend: Record<string, string>;
 };
+
+export type DealerResult = FindAgroDealersOutput['dealers'];
 
 const nutritionBasketMap = {
   general: "A balanced mix of essential vitamins and minerals for overall health.",
@@ -76,4 +80,12 @@ export async function getGardenLayout(
   }
 
   return layoutData;
+}
+
+export async function getDealers(region: string): Promise<DealerResult> {
+  const result = await findAgroDealers({ region });
+  if (!result || !result.dealers || result.dealers.length === 0) {
+    throw new Error('The AI could not find any dealers for the selected region.');
+  }
+  return result.dealers;
 }

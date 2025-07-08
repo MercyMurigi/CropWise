@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { CropForm } from "@/components/crop-form";
 import { RecommendationsDisplay } from "@/components/recommendations-display";
-import { getRecommendations, RecommendationResult, getGardenLayout, LayoutResult } from "@/app/actions";
+import { getRecommendations, RecommendationResult, getGardenLayout, LayoutResult, getDealers, DealerResult } from "@/app/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
@@ -14,6 +14,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { GardenLayoutDisplay } from "@/components/garden-layout-display";
+import { DealersDisplay } from "@/components/dealers-display";
 
 const LoadingSkeletons = () => (
   <div className="mt-12 space-y-8">
@@ -74,8 +75,13 @@ export default function RecommendPage() {
   const [recommendations, setRecommendations] =
     useState<RecommendationResult | null>(null);
   const [layout, setLayout] = useState<LayoutResult | null>(null);
+  const [dealers, setDealers] = useState<DealerResult | null>(null);
+  const [formValues, setFormValues] = useState<CropFormValues | null>(null);
+
   const [isLoading, setIsLoading] = useState(false);
   const [isLayoutLoading, setIsLayoutLoading] = useState(false);
+  const [isDealersLoading, setIsDealersLoading] = useState(false);
+
   const { toast } = useToast();
 
   const handleSubmit = async (formData: CropFormValues) => {
@@ -83,6 +89,8 @@ export default function RecommendPage() {
     setIsLoading(true);
     setRecommendations(null);
     setLayout(null);
+    setDealers(null);
+    setFormValues(formData); // Store form values for later use
     
     let recommendationsResult: RecommendationResult | null = null;
     
@@ -137,6 +145,26 @@ export default function RecommendPage() {
     }
   };
 
+  const handleFindDealers = async () => {
+    if (!formValues) return;
+    setIsDealersLoading(true);
+    setDealers(null);
+    try {
+        const dealersResult = await getDealers(formValues.region);
+        setDealers(dealersResult);
+    } catch (e) {
+        const errorMessage =
+            e instanceof Error ? e.message : "An unknown error occurred.";
+        toast({
+            variant: "destructive",
+            title: "Could not find dealers",
+            description: errorMessage,
+        });
+    } finally {
+        setIsDealersLoading(false);
+    }
+  }
+
   return (
     <main className="container mx-auto px-4 py-12 md:py-20">
       <div className="mb-8">
@@ -159,16 +187,30 @@ export default function RecommendPage() {
       </header>
 
       <div className="max-w-3xl mx-auto">
-        <CropForm onSubmit={handleSubmit} isLoading={isLoading || isLayoutLoading} />
+        <CropForm onSubmit={handleSubmit} isLoading={isLoading || isLayoutLoading || isDealersLoading} />
       </div>
 
       {isLoading && <LoadingSkeletons />}
 
       {recommendations && !isLoading && (
         <div className="mt-16">
-          <RecommendationsDisplay data={recommendations} />
+          <RecommendationsDisplay
+            data={recommendations}
+            onFindDealers={handleFindDealers}
+            isDealersLoading={isDealersLoading}
+            dealersFound={!!dealers}
+          />
           {isLayoutLoading && <LayoutLoadingSkeleton />}
           {layout && !isLayoutLoading && <GardenLayoutDisplay data={layout} />}
+          {isDealersLoading && (
+             <div className="flex justify-center items-center gap-2 mt-8">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                <p className="text-center text-lg text-muted-foreground">
+                    Searching for local agro-dealers...
+                </p>
+            </div>
+          )}
+          {dealers && <DealersDisplay dealers={dealers} />}
         </div>
       )}
     </main>
