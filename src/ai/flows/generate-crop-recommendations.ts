@@ -128,7 +128,7 @@ The object must contain:
 {{#if (eq gardenType "community")}}
 The JSON object MUST ALSO include these fields for community planning:
 3. "areaRequired": A string estimating the total land area required in square meters to feed the specified number of people.
-4. "seedQuantities": An array of objects, one for each recommended crop, with "cropName" and "quantity" (e.g., "500g").
+4. "seedQuantities": An array of objects, one for each recommended crop, with "cropName" and "quantity" (e.g., [{ "cropName": "Maize", "quantity": "500g" }]).
 5. "plantingSchedule": A string describing a simple, actionable planting schedule over a few weeks.
 6. "estimatedWeeklyYield": A string estimating the expected weekly harvest in kilograms once the crops mature.
 {{/if}}
