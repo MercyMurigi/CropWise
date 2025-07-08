@@ -101,12 +101,12 @@ export function RecommendationsDisplay({
             <div className="p-4 bg-background rounded-lg text-center">
               <Square className="mx-auto h-8 w-8 text-accent mb-2"/>
               <h4 className="font-bold text-lg">Area Required</h4>
-              <p className="text-2xl text-primary font-semibold">{data.areaRequired}</p>
+              <p className="text-xl text-primary font-semibold">{data.areaRequired}</p>
             </div>
              <div className="p-4 bg-background rounded-lg text-center">
               <TrendingUp className="mx-auto h-8 w-8 text-accent mb-2"/>
               <h4 className="font-bold text-lg">Est. Weekly Yield</h4>
-              <p className="text-2xl text-primary font-semibold">{data.estimatedWeeklyYield}</p>
+              <p className="text-xl text-primary font-semibold">{data.estimatedWeeklyYield}</p>
             </div>
             <div className="p-4 bg-background rounded-lg text-left">
                 <Package className="h-8 w-8 text-accent mb-2"/>
