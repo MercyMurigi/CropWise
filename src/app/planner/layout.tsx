@@ -8,7 +8,7 @@ export default function PlannerLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="container mx-auto px-4 py-12 md:py-20">
+    <div className="container mx-auto px-4 py-12 md:py-20">
       <div className="mb-8">
         <Button asChild variant="outline">
           <Link href="/">
@@ -26,6 +26,6 @@ export default function PlannerLayout({
         </p>
       </header>
       {children}
-    </main>
+    </div>
   );
 }
