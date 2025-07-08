@@ -28,11 +28,10 @@ export default function LandingPage() {
               </div>
               <div className="flex items-center justify-center">
                 <Image
-                  src="https://placehold.co/600x700.png"
+                  src="https://plus.unsplash.com/premium_photo-1663134176504-c64cede0d0a2?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                   width={600}
                   height={700}
                   alt="A vibrant home garden with various vegetables"
-                  data-ai-hint="vibrant vegetable garden"
                   className="mx-auto overflow-hidden rounded-xl object-cover object-center sm:w-full"
                 />
               </div>
