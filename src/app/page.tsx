@@ -1,99 +1,81 @@
-"use client";
+import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
 
-import { useState } from "react";
-import { CropForm } from "@/components/crop-form";
-import { RecommendationsDisplay } from "@/components/recommendations-display";
-import { getRecommendations, RecommendationResult } from "@/app/actions";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
-import type { CropFormValues } from "@/components/crop-form";
-import { useToast } from "@/hooks/use-toast";
-import { SnapMyGarden } from "@/components/snap-my-garden";
-
-const LoadingSkeletons = () => (
-  <div className="mt-12 space-y-8">
-    <div className="flex justify-center items-center gap-2 mb-4">
-      <Loader2 className="h-6 w-6 animate-spin text-primary" />
-      <p className="text-center text-lg text-muted-foreground">
-        Generating your personalized crop plan...
-      </p>
-    </div>
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {[...Array(3)].map((_, i) => (
-        <Card key={i}>
-          <CardHeader className="flex-row items-center gap-4 space-y-0">
-            <Skeleton className="h-8 w-8 rounded-full" />
-            <Skeleton className="h-6 w-3/4" />
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-5/6" />
-            <Skeleton className="h-10 w-full mt-4" />
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  </div>
-);
-
-export default function Home() {
-  const [recommendations, setRecommendations] =
-    useState<RecommendationResult | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
-
-  const handleSubmit = async (formData: CropFormValues) => {
-    setIsLoading(true);
-    setRecommendations(null);
-    try {
-      const result = await getRecommendations(formData);
-      if (!result || result.crops.length === 0) {
-        throw new Error(
-          "Could not generate recommendations for the given input."
-        );
-      }
-      setRecommendations(result);
-    } catch (e) {
-      const errorMessage =
-        e instanceof Error ? e.message : "An unknown error occurred.";
-      toast({
-        variant: "destructive",
-        title: "Something went wrong",
-        description: errorMessage,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+export default function LandingPage() {
   return (
-    <main className="container mx-auto px-4 py-12 md:py-20">
-      <header className="text-center mb-12">
-        <h1 className="text-5xl md:text-6xl font-headline font-bold text-primary mb-2">
-          CropWise Nutrition
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Your AI partner for a healthier harvest. Get intelligent crop
-          recommendations tailored to your needs.
-        </p>
-      </header>
+    <>
+      <main className="flex-1">
+        <section className="w-full py-20 md:py-24 lg:py-32 xl:py-40">
+          <div className="container px-4 md:px-6">
+            <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
+              <div className="flex flex-col justify-center space-y-6">
+                <div className="space-y-4">
+                  <h1 className="text-5xl font-headline font-bold tracking-tighter text-primary sm:text-6xl xl:text-7xl/none">
+                    Cultivate Your Perfect Garden
+                  </h1>
+                  <p className="max-w-[600px] text-muted-foreground md:text-xl lg:text-lg xl:text-xl">
+                    Get AI-powered crop recommendations, visual planting guides, and expert feedback to grow a thriving, nutritious garden tailored to your family's needs.
+                  </p>
+                </div>
+                <Link href="/planner">
+                  <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-8 py-6 text-lg">
+                    Start Planning Your Garden
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </Link>
+              </div>
+              <div className="flex items-center justify-center">
+                <Image
+                  src="https://placehold.co/600x700.png"
+                  width={600}
+                  height={700}
+                  alt="A vibrant home garden with various vegetables"
+                  data-ai-hint="vibrant vegetable garden"
+                  className="mx-auto overflow-hidden rounded-xl object-cover object-center sm:w-full"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
 
-      <div className="max-w-3xl mx-auto">
-        <CropForm onSubmit={handleSubmit} isLoading={isLoading} />
-      </div>
-
-      {isLoading && <LoadingSkeletons />}
-
-      {recommendations && (
-        <div className="mt-16">
-          <RecommendationsDisplay data={recommendations} />
-        </div>
-      )}
-
-      <div className="max-w-3xl mx-auto">
-        <SnapMyGarden />
-      </div>
-    </main>
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-muted/40">
+            <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
+                <div className="space-y-3">
+                    <h2 className="text-3xl font-headline font-bold tracking-tighter text-primary md:text-4xl/tight">
+                        Features Designed for You
+                    </h2>
+                    <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                        From planning to harvest, we've got you covered.
+                    </p>
+                </div>
+                <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-3">
+                    <div className="grid gap-1 text-left p-4 rounded-lg">
+                        <h3 className="text-lg font-bold">Visual Garden Planner</h3>
+                        <p className="text-sm text-muted-foreground">
+                            Generate a simple planting map based on your land size and chosen nutrition goals.
+                        </p>
+                    </div>
+                    <div className="grid gap-1 text-left p-4 rounded-lg">
+                        <h3 className="text-lg font-bold">Seed Bundles</h3>
+                        <p className="text-sm text-muted-foreground">
+                            Order pre-packaged seed bundles or find nearby agro-dealers for easy pickup.
+                        </p>
+                    </div>
+                    <div className="grid gap-1 text-left p-4 rounded-lg">
+                        <h3 className="text-lg font-bold">Snap My Garden</h3>
+                        <p className="text-sm text-muted-foreground">
+                            Upload a photo of your garden for instant AI-powered feedback and tips.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+      </main>
+      <footer className="flex items-center justify-center py-6 border-t">
+         <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} CropWise Nutrition</p>
+      </footer>
+    </>
   );
 }
