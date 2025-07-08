@@ -36,9 +36,15 @@ export const nutritionBaskets = {
   maternal_health: "Maternal Health"
 };
 
+export const months = [
+  "January", "February", "March", "April", "May", "June", 
+  "July", "August", "September", "October", "November", "December"
+];
+
 const formSchema = z.object({
   landSize: z.string().min(1, "Land size is required."),
   region: z.string().min(1, "Region or county is required."),
+  plantingMonth: z.string({ required_error: "Planting month is required."}),
   familySize: z.coerce.number().min(1, "Size must be at least 1."),
   dietaryNeeds: z.enum(Object.keys(nutritionBaskets) as [keyof typeof nutritionBaskets, ...(keyof typeof nutritionBaskets)[]]),
   waterAvailability: z.enum(["rainfed", "irrigated", "sack/bag garden", "balcony garden"]),
@@ -58,6 +64,7 @@ export function CropForm({ onSubmit, isLoading, isCommunity = false }: CropFormP
     defaultValues: {
       landSize: "",
       region: "",
+      plantingMonth: months[new Date().getMonth()],
       familySize: isCommunity ? 20 : 1,
       dietaryNeeds: "general",
       waterAvailability: "rainfed",
@@ -168,7 +175,7 @@ export function CropForm({ onSubmit, isLoading, isCommunity = false }: CropFormP
                   </FormItem>
                 )}
               />
-              <FormField
+               <FormField
                 control={form.control}
                 name="region"
                 render={({ field }) => (
@@ -198,68 +205,93 @@ export function CropForm({ onSubmit, isLoading, isCommunity = false }: CropFormP
                   </FormItem>
                 )}
               />
-              <FormField
+               <FormField
                 control={form.control}
-                name="waterAvailability"
+                name="plantingMonth"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Planting Location</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <FormLabel>Planting Month</FormLabel>
+                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a location" />
+                          <SelectValue placeholder="Select a month" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="rainfed">On Ground (Rain-fed)</SelectItem>
-                        <SelectItem value="irrigated">On Ground (Irrigated)</SelectItem>
-                        <SelectItem value="sack/bag garden">
-                          Sack/Bag Garden
-                        </SelectItem>
-                        <SelectItem value="balcony garden">
-                          Balcony Garden
-                        </SelectItem>
+                        {months.map((month) => (
+                           <SelectItem key={month} value={month}>{month}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
-                    <FormDescription>
-                      Where you will be planting.
-                    </FormDescription>
+                    <FormDescription>The month you plan to start planting.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="dietaryNeeds"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nutrition Goal</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a nutrition goal" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {Object.entries(nutritionBaskets).map(([key, value]) => (
-                        <SelectItem key={key} value={key}>{value}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Choose a nutritional focus for your garden.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+             <div className="grid md:grid-cols-2 gap-6">
+                 <FormField
+                    control={form.control}
+                    name="waterAvailability"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Planting Location</FormLabel>
+                        <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        >
+                        <FormControl>
+                            <SelectTrigger>
+                            <SelectValue placeholder="Select a location" />
+                            </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            <SelectItem value="rainfed">On Ground (Rain-fed)</SelectItem>
+                            <SelectItem value="irrigated">On Ground (Irrigated)</SelectItem>
+                            <SelectItem value="sack/bag garden">
+                            Sack/Bag Garden
+                            </SelectItem>
+                            <SelectItem value="balcony garden">
+                            Balcony Garden
+                            </SelectItem>
+                        </SelectContent>
+                        </Select>
+                        <FormDescription>
+                        Where you will be planting.
+                        </FormDescription>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={form.control}
+                    name="dietaryNeeds"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Nutrition Goal</FormLabel>
+                        <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                        >
+                            <FormControl>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select a nutrition goal" />
+                            </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                            {Object.entries(nutritionBaskets).map(([key, value]) => (
+                                <SelectItem key={key} value={key}>{value}</SelectItem>
+                            ))}
+                            </SelectContent>
+                        </Select>
+                        <FormDescription>
+                            Choose a nutritional focus for your garden.
+                        </FormDescription>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+             </div>
             <div className="flex items-stretch gap-4">
               <Button
                 type="submit"
